@@ -8,6 +8,7 @@ import GeolocationPage from "./pages/GeolocationPage";
 import ReservationPage from "./pages/ReservationPage";
 import QuizPage from "./pages/QuizPage";
 import ResultPage from "./pages/ResultPage";
+import AuthPage from "./pages/AuthPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -20,6 +21,7 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<SplashScreen />} />
+          <Route path="/auth" element={<AuthPage />} />
           <Route path="/geolocation" element={<GeolocationPage />} />
           <Route path="/reservation" element={<ReservationPage />} />
           <Route path="/quiz" element={<QuizPage />} />

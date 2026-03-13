@@ -25,7 +25,7 @@ const SplashScreen = () => {
         {t("splash_greeting")}
       </motion.p>
       <motion.button
-        onClick={() => navigate("/geolocation")}
+        onClick={() => navigate("/auth")}
         className="mt-10 px-8 py-4 rounded-full bg-accent text-accent-foreground font-heading font-semibold text-lg shadow-lg hover:shadow-xl transition-shadow"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
