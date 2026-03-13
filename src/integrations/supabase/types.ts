@@ -14,7 +14,235 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      favorites: {
+        Row: {
+          created_at: string
+          id: string
+          restaurant_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          restaurant_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          restaurant_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "favorites_restaurant_id_fkey"
+            columns: ["restaurant_id"]
+            isOneToOne: false
+            referencedRelation: "restaurants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          email: string | null
+          first_name: string | null
+          id: string
+          last_name: string | null
+          phone: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          email?: string | null
+          first_name?: string | null
+          id?: string
+          last_name?: string | null
+          phone?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          email?: string | null
+          first_name?: string | null
+          id?: string
+          last_name?: string | null
+          phone?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      reservations: {
+        Row: {
+          created_at: string
+          date: string
+          guests: number
+          id: string
+          restaurant_id: string
+          status: string | null
+          time: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          date: string
+          guests?: number
+          id?: string
+          restaurant_id: string
+          status?: string | null
+          time: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          date?: string
+          guests?: number
+          id?: string
+          restaurant_id?: string
+          status?: string | null
+          time?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reservations_restaurant_id_fkey"
+            columns: ["restaurant_id"]
+            isOneToOne: false
+            referencedRelation: "restaurants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      restaurants: {
+        Row: {
+          address: string
+          ambiance: string[] | null
+          available_tables: number | null
+          budget: number | null
+          city: string | null
+          created_at: string
+          cuisine: string
+          distance: string | null
+          distance_minutes: number | null
+          food_type: string[] | null
+          id: string
+          is_new: boolean | null
+          manager_name: string | null
+          name: string
+          opening_hours: string | null
+          owner_id: string | null
+          phone: string | null
+          photo: string | null
+          price_range: string | null
+          rating: number | null
+          tags: string[] | null
+          terrasse: boolean | null
+          updated_at: string
+        }
+        Insert: {
+          address: string
+          ambiance?: string[] | null
+          available_tables?: number | null
+          budget?: number | null
+          city?: string | null
+          created_at?: string
+          cuisine: string
+          distance?: string | null
+          distance_minutes?: number | null
+          food_type?: string[] | null
+          id?: string
+          is_new?: boolean | null
+          manager_name?: string | null
+          name: string
+          opening_hours?: string | null
+          owner_id?: string | null
+          phone?: string | null
+          photo?: string | null
+          price_range?: string | null
+          rating?: number | null
+          tags?: string[] | null
+          terrasse?: boolean | null
+          updated_at?: string
+        }
+        Update: {
+          address?: string
+          ambiance?: string[] | null
+          available_tables?: number | null
+          budget?: number | null
+          city?: string | null
+          created_at?: string
+          cuisine?: string
+          distance?: string | null
+          distance_minutes?: number | null
+          food_type?: string[] | null
+          id?: string
+          is_new?: boolean | null
+          manager_name?: string | null
+          name?: string
+          opening_hours?: string | null
+          owner_id?: string | null
+          phone?: string | null
+          photo?: string | null
+          price_range?: string | null
+          rating?: number | null
+          tags?: string[] | null
+          terrasse?: boolean | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      reviews: {
+        Row: {
+          created_at: string
+          id: string
+          rating: number
+          reservation_id: string | null
+          restaurant_id: string
+          text: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          rating: number
+          reservation_id?: string | null
+          restaurant_id: string
+          text?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          rating?: number
+          reservation_id?: string | null
+          restaurant_id?: string
+          text?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reviews_reservation_id_fkey"
+            columns: ["reservation_id"]
+            isOneToOne: false
+            referencedRelation: "reservations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reviews_restaurant_id_fkey"
+            columns: ["restaurant_id"]
+            isOneToOne: false
+            referencedRelation: "restaurants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
