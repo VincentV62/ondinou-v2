@@ -10,6 +10,7 @@ import QuizPage from "./pages/QuizPage";
 import ResultPage from "./pages/ResultPage";
 import AuthPage from "./pages/AuthPage";
 import NotFound from "./pages/NotFound";
+import RestaurantDashboard from "./pages/RestaurantDashboard";
 
 const queryClient = new QueryClient();
 
