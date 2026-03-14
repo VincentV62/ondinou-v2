@@ -1,0 +1,272 @@
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
+import { motion } from "framer-motion";
+import {
+  Users, CalendarCheck, Star, Heart, Download, ArrowLeft,
+} from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import {
+  Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
+} from "@/components/ui/table";
+import {
+  ChartContainer, ChartTooltip, ChartTooltipContent,
+} from "@/components/ui/chart";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid } from "recharts";
+
+interface ReservationRow {
+  id: string;
+  date: string;
+  time: string;
+  guests: number;
+  status: string | null;
+  user_id: string;
+  restaurant_id: string;
+  profile?: { first_name: string | null; last_name: string | null } | null;
+  review?: { rating: number; text: string | null } | null;
+}
+
+const EMOJI_MAP: Record<number, string> = {
+  1: "😢", 2: "😕", 3: "🙂", 4: "😄", 5: "🤩",
+};
+
+// Demo data for chart (weekly reservations)
+function buildWeeklyData(reservations: ReservationRow[]) {
+  const days = ["Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"];
+  const counts = new Array(7).fill(0);
+  reservations.forEach((r) => {
+    const d = new Date(r.date).getDay();
+    const idx = d === 0 ? 6 : d - 1;
+    counts[idx]++;
+  });
+  return days.map((day, i) => ({ day, reservations: counts[i] }));
+}
+
+function exportCSV(reservations: ReservationRow[]) {
+  const header = "Date,Heure,Client,Couverts,Avis\n";
+  const rows = reservations.map((r) => {
+    const name = r.profile
+      ? `${r.profile.first_name || ""} ${r.profile.last_name || ""}`.trim()
+      : "—";
+    const review = r.review ? `${r.review.rating}/5` : "—";
+    return `${r.date},${r.time},${name},${r.guests},${review}`;
+  });
+  const blob = new Blob([header + rows.join("\n")], { type: "text/csv" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "reservations-ondinou.csv";
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+const chartConfig = {
+  reservations: {
+    label: "Réservations",
+    color: "hsl(var(--accent))",
+  },
+};
+
+export default function RestaurantDashboard() {
+  const navigate = useNavigate();
+  const [reservations, setReservations] = useState<ReservationRow[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [restaurantName, setRestaurantName] = useState("Mon restaurant");
+
+  useEffect(() => {
+    async function load() {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) { navigate("/auth"); return; }
+
+      // Get owner's restaurant
+      const { data: restaurants } = await supabase
+        .from("restaurants")
+        .select("id, name")
+        .eq("owner_id", user.id)
+        .limit(1);
+
+      if (!restaurants?.length) {
+        // Demo mode: show all reservations
+        const { data: allRes } = await supabase
+          .from("reservations")
+          .select("*")
+          .order("date", { ascending: false })
+          .limit(50);
+
+        if (allRes) {
+          // Fetch profiles & reviews separately
+          const userIds = [...new Set(allRes.map(r => r.user_id))];
+          const resIds = allRes.map(r => r.id);
+          
+          const [profilesRes, reviewsRes] = await Promise.all([
+            supabase.from("profiles").select("user_id, first_name, last_name").in("user_id", userIds),
+            supabase.from("reviews").select("reservation_id, rating, text").in("reservation_id", resIds),
+          ]);
+
+          const profileMap = new Map((profilesRes.data || []).map(p => [p.user_id, p]));
+          const reviewMap = new Map((reviewsRes.data || []).map(r => [r.reservation_id, r]));
+
+          setReservations(allRes.map(r => ({
+            ...r,
+            profile: profileMap.get(r.user_id) || null,
+            review: reviewMap.get(r.id) || null,
+          })));
+        }
+        setRestaurantName("ONDINOU Demo");
+        setLoading(false);
+        return;
+      }
+
+      const resto = restaurants[0];
+      setRestaurantName(resto.name);
+
+      const { data: resData } = await supabase
+        .from("reservations")
+        .select("*")
+        .eq("restaurant_id", resto.id)
+        .order("date", { ascending: false })
+        .limit(100);
+
+      if (resData) {
+        const userIds = [...new Set(resData.map(r => r.user_id))];
+        const resIds = resData.map(r => r.id);
+
+        const [profilesRes, reviewsRes] = await Promise.all([
+          supabase.from("profiles").select("user_id, first_name, last_name").in("user_id", userIds.length ? userIds : ["none"]),
+          supabase.from("reviews").select("reservation_id, rating, text").in("reservation_id", resIds.length ? resIds : ["none"]),
+        ]);
+
+        const profileMap = new Map((profilesRes.data || []).map(p => [p.user_id, p]));
+        const reviewMap = new Map((reviewsRes.data || []).map(r => [r.reservation_id, r]));
+
+        setReservations(resData.map(r => ({
+          ...r,
+          profile: profileMap.get(r.user_id) || null,
+          review: reviewMap.get(r.id) || null,
+        })));
+      }
+      setLoading(false);
+    }
+    load();
+  }, [navigate]);
+
+  const avgRating = reservations.filter(r => r.review).length
+    ? (reservations.filter(r => r.review).reduce((s, r) => s + (r.review?.rating || 0), 0) / reservations.filter(r => r.review).length).toFixed(1)
+    : "—";
+
+  const superfans = reservations.filter(r => r.review && r.review.rating >= 4).length;
+  const weeklyData = buildWeeklyData(reservations);
+
+  return (
+    <div className="min-h-screen bg-background">
+      {/* Header */}
+      <header className="sticky top-0 z-10 bg-primary text-primary-foreground px-4 py-3 flex items-center gap-3">
+        <Button variant="ghost" size="icon" onClick={() => navigate("/")} className="text-primary-foreground hover:bg-primary-foreground/10">
+          <ArrowLeft className="h-5 w-5" />
+        </Button>
+        <h1 className="font-heading text-lg font-semibold truncate">{restaurantName}</h1>
+      </header>
+
+      <div className="max-w-5xl mx-auto p-4 space-y-6">
+        {/* KPI Cards */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="grid grid-cols-2 md:grid-cols-4 gap-3"
+        >
+          {[
+            { label: "Clients envoyés ce mois", value: reservations.length, icon: Users, color: "text-secondary" },
+            { label: "Réservations ONDINOU", value: reservations.length, icon: CalendarCheck, color: "text-accent" },
+            { label: "Note moyenne Dinou", value: avgRating, icon: Star, color: "text-accent" },
+            { label: "Superfans", value: superfans, icon: Heart, color: "text-destructive" },
+          ].map((kpi) => (
+            <Card key={kpi.label} className="glass-card">
+              <CardContent className="p-4 flex flex-col items-center text-center gap-1">
+                <kpi.icon className={`h-6 w-6 ${kpi.color}`} />
+                <span className="text-2xl font-heading font-bold">{kpi.value}</span>
+                <span className="text-xs text-muted-foreground leading-tight">{kpi.label}</span>
+              </CardContent>
+            </Card>
+          ))}
+        </motion.div>
+
+        {/* Chart */}
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
+          <Card className="glass-card">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-base font-heading">Réservations par semaine</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <ChartContainer config={chartConfig} className="h-[200px] w-full">
+                <BarChart data={weeklyData}>
+                  <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
+                  <XAxis dataKey="day" className="text-xs" />
+                  <YAxis allowDecimals={false} className="text-xs" />
+                  <ChartTooltip content={<ChartTooltipContent />} />
+                  <Bar dataKey="reservations" fill="hsl(var(--accent))" radius={[6, 6, 0, 0]} />
+                </BarChart>
+              </ChartContainer>
+            </CardContent>
+          </Card>
+        </motion.div>
+
+        {/* CRM Table */}
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
+          <Card className="glass-card overflow-hidden">
+            <CardHeader className="pb-2 flex flex-row items-center justify-between">
+              <CardTitle className="text-base font-heading">Réservations</CardTitle>
+              <div className="flex gap-2">
+                <Button size="sm" variant="outline" onClick={() => exportCSV(reservations)}>
+                  <Download className="h-4 w-4 mr-1" /> CSV
+                </Button>
+              </div>
+            </CardHeader>
+            <CardContent className="p-0">
+              {loading ? (
+                <p className="p-6 text-center text-muted-foreground">Chargement…</p>
+              ) : reservations.length === 0 ? (
+                <p className="p-6 text-center text-muted-foreground">Aucune réservation pour le moment.</p>
+              ) : (
+                <div className="overflow-x-auto">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Date</TableHead>
+                        <TableHead>Heure</TableHead>
+                        <TableHead>Client</TableHead>
+                        <TableHead className="text-center">Couverts</TableHead>
+                        <TableHead className="text-center">Avis</TableHead>
+                        <TableHead className="text-center">Superfan</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {reservations.map((r) => (
+                        <TableRow key={r.id}>
+                          <TableCell className="whitespace-nowrap">{new Date(r.date).toLocaleDateString("fr-FR", { day: "2-digit", month: "2-digit" })}</TableCell>
+                          <TableCell>{r.time}</TableCell>
+                          <TableCell>
+                            {r.profile
+                              ? `${r.profile.first_name || ""} ${r.profile.last_name || ""}`.trim() || "—"
+                              : "—"}
+                          </TableCell>
+                          <TableCell className="text-center">{r.guests}</TableCell>
+                          <TableCell className="text-center">
+                            {r.review ? EMOJI_MAP[r.review.rating] || `${r.review.rating}/5` : "—"}
+                          </TableCell>
+                          <TableCell className="text-center">
+                            {r.review && r.review.rating >= 4 ? "⭐" : ""}
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </motion.div>
+      </div>
+    </div>
+  );
+}
