@@ -11,6 +11,7 @@ import ResultPage from "./pages/ResultPage";
 import AuthPage from "./pages/AuthPage";
 import NotFound from "./pages/NotFound";
 import RestaurantDashboard from "./pages/RestaurantDashboard";
+import RestaurantSignup from "./pages/RestaurantSignup";
 
 const queryClient = new QueryClient();
 
