@@ -11,6 +11,7 @@ import ResultPage from "./pages/ResultPage";
 import AuthPage from "./pages/AuthPage";
 import NotFound from "./pages/NotFound";
 import RestaurantDashboard from "./pages/RestaurantDashboard";
+import RestaurantSignup from "./pages/RestaurantSignup";
 
 const queryClient = new QueryClient();
 
@@ -27,6 +28,7 @@ const App = () => (
           <Route path="/reservation" element={<ReservationPage />} />
           <Route path="/quiz" element={<QuizPage />} />
           <Route path="/result" element={<ResultPage />} />
+          <Route path="/restaurant-signup" element={<RestaurantSignup />} />
           <Route path="/restaurant-dashboard" element={<RestaurantDashboard />} />
           <Route path="*" element={<NotFound />} />
         </Routes>

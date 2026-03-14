@@ -35,7 +35,7 @@ const SplashScreen = () => {
         {t("splash_cta")}
       </motion.button>
       <motion.button
-        onClick={() => navigate("/restaurant-dashboard")}
+        onClick={() => navigate("/restaurant-signup")}
         className="mt-4 px-6 py-3 rounded-full bg-primary text-primary-foreground font-heading font-semibold text-sm shadow-md hover:shadow-lg transition-shadow"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
