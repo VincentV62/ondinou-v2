@@ -34,6 +34,16 @@ const SplashScreen = () => {
       >
         {t("splash_cta")}
       </motion.button>
+      <motion.button
+        onClick={() => navigate("/restaurant-dashboard")}
+        className="mt-4 px-6 py-3 rounded-full bg-primary text-primary-foreground font-heading font-semibold text-sm shadow-md hover:shadow-lg transition-shadow"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 1.1, duration: 0.5 }}
+        whileTap={{ scale: 0.95 }}
+      >
+        Je suis restaurateur
+      </motion.button>
     </div>
   );
 };
