@@ -67,7 +67,7 @@ const ResultPage = () => {
           animate={{ opacity: 1, scale: 1 }}
         >
           <p className="text-foreground text-center font-body text-xs">
-            {reserved ? "Réservation confirmée ! Bon appétit 🎉" : "J'ai trouvé le spot parfait pour toi ! 🎉"}
+            J'ai trouvé le spot parfait pour toi ! 🎉
           </p>
         </motion.div>
       </div>
