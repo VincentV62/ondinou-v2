@@ -2,26 +2,15 @@ import { useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { Star, MapPin, Users, Clock } from "lucide-react";
-import { useQuery } from "@tanstack/react-query";
 import dinouLogo from "@/assets/dinou-logo.png";
 import { matchRestaurants, type QuizAnswers, type Restaurant } from "@/data/restaurants";
-import { supabase } from "@/integrations/supabase/client";
 import { t } from "@/data/i18n";
 
 const ResultPage = () => {
   const navigate = useNavigate();
   const [index, setIndex] = useState(0);
-  const [reserving, setReserving] = useState(false);
-  const [reserved, setReserved] = useState(false);
 
-  // Try fetching from Supabase, fallback to local mock
-  const { data: dbRestaurants } = useQuery({
-    queryKey: ["restaurants"],
-    queryFn: async () => {
-      const { data } = await supabase.from("restaurants").select("*");
-      return data;
-    },
-  });
+
 
   const results = useMemo(() => {
     try {
@@ -48,31 +37,15 @@ const ResultPage = () => {
 
   const restaurant: Restaurant = results[index];
 
-  const handleReserve = async () => {
-    setReserving(true);
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) {
-      navigate("/auth");
-      return;
-    }
+  const handleReserve = () => {
+    // Open Google search for the restaurant's reservation page
+    const query = encodeURIComponent(`${restaurant.name} ${restaurant.address} réservation`);
+    window.open(`https://www.google.com/search?q=${query}`, "_blank");
+  };
 
-    // Find the DB restaurant ID matching by name
-    const dbMatch = dbRestaurants?.find((r: any) => r.name === restaurant.name);
-    if (dbMatch) {
-      const reservationDate = sessionStorage.getItem("reservationDate") || new Date().toISOString().split("T")[0];
-      const reservationTime = sessionStorage.getItem("reservationTime") || "19:30";
-      const guests = JSON.parse(sessionStorage.getItem("quizAnswers") || "{}").guests || 2;
-
-      await supabase.from("reservations").insert({
-        user_id: user.id,
-        restaurant_id: dbMatch.id,
-        date: reservationDate,
-        time: reservationTime,
-        guests,
-      });
-    }
-    setReserved(true);
-    setReserving(false);
+  const handleViewMap = () => {
+    const query = encodeURIComponent(`${restaurant.name} ${restaurant.address}`);
+    window.open(`https://www.google.com/maps/search/?api=1&query=${query}`, "_blank");
   };
 
   return (
@@ -85,7 +58,7 @@ const ResultPage = () => {
           animate={{ opacity: 1, scale: 1 }}
         >
           <p className="text-foreground text-center font-body text-xs">
-            {reserved ? "Réservation confirmée ! Bon appétit 🎉" : "J'ai trouvé le spot parfait pour toi ! 🎉"}
+            J'ai trouvé le spot parfait pour toi ! 🎉
           </p>
         </motion.div>
       </div>
@@ -148,34 +121,25 @@ const ResultPage = () => {
       </motion.div>
 
       <div className="mt-6 space-y-3 max-w-sm mx-auto w-full pb-6">
-        {reserved ? (
-          <div className="text-center">
-            <p className="text-foreground font-heading font-semibold text-lg">✅ Réservé !</p>
-            <button onClick={() => navigate("/")} className="mt-3 px-6 py-3 rounded-full bg-accent text-accent-foreground font-heading font-semibold">
-              Retour à l'accueil
-            </button>
-          </div>
-        ) : (
-          <>
-            <button
-              onClick={handleReserve}
-              disabled={reserving}
-              className="w-full py-3 rounded-full bg-accent text-accent-foreground font-heading font-semibold shadow-lg disabled:opacity-50"
-            >
-              {reserving ? "Réservation..." : t("reserve")}
-            </button>
-            <button className="w-full py-3 rounded-full bg-card text-card-foreground border border-border font-heading font-medium">
-              {t("view_map")}
-            </button>
-            {index < results.length - 1 && (
-              <button
-                onClick={() => setIndex(index + 1)}
-                className="w-full py-3 rounded-full bg-muted text-muted-foreground font-heading font-medium"
-              >
-                {t("change")}
-              </button>
-            )}
-          </>
+        <button
+          onClick={handleReserve}
+          className="w-full py-3 rounded-full bg-accent text-accent-foreground font-heading font-semibold shadow-lg"
+        >
+          {t("reserve")}
+        </button>
+        <button
+          onClick={handleViewMap}
+          className="w-full py-3 rounded-full bg-card text-card-foreground border border-border font-heading font-medium"
+        >
+          {t("view_map")}
+        </button>
+        {index < results.length - 1 && (
+          <button
+            onClick={() => setIndex(index + 1)}
+            className="w-full py-3 rounded-full bg-muted text-muted-foreground font-heading font-medium"
+          >
+            {t("change")}
+          </button>
         )}
       </div>
     </div>
