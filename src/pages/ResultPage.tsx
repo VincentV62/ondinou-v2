@@ -48,31 +48,15 @@ const ResultPage = () => {
 
   const restaurant: Restaurant = results[index];
 
-  const handleReserve = async () => {
-    setReserving(true);
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) {
-      navigate("/auth");
-      return;
-    }
+  const handleReserve = () => {
+    // Open Google search for the restaurant's reservation page
+    const query = encodeURIComponent(`${restaurant.name} ${restaurant.address} réservation`);
+    window.open(`https://www.google.com/search?q=${query}`, "_blank");
+  };
 
-    // Find the DB restaurant ID matching by name
-    const dbMatch = dbRestaurants?.find((r: any) => r.name === restaurant.name);
-    if (dbMatch) {
-      const reservationDate = sessionStorage.getItem("reservationDate") || new Date().toISOString().split("T")[0];
-      const reservationTime = sessionStorage.getItem("reservationTime") || "19:30";
-      const guests = JSON.parse(sessionStorage.getItem("quizAnswers") || "{}").guests || 2;
-
-      await supabase.from("reservations").insert({
-        user_id: user.id,
-        restaurant_id: dbMatch.id,
-        date: reservationDate,
-        time: reservationTime,
-        guests,
-      });
-    }
-    setReserved(true);
-    setReserving(false);
+  const handleViewMap = () => {
+    const query = encodeURIComponent(`${restaurant.name} ${restaurant.address}`);
+    window.open(`https://www.google.com/maps/search/?api=1&query=${query}`, "_blank");
   };
 
   return (
