@@ -1,6 +1,7 @@
 import { useState, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { t } from "@/data/i18n";
 import dinouLogo from "@/assets/dinou-logo.png";
 import type { QuizAnswers } from "@/data/restaurants";
@@ -46,6 +47,20 @@ const QuizPage = () => {
   const q = questions[step];
   const progress = ((step + 1) / questions.length) * 100;
 
+  const goNext = useCallback(() => {
+    if (step < questions.length - 1) {
+      setDir(1);
+      setStep(step + 1);
+    }
+  }, [step]);
+
+  const goBack = useCallback(() => {
+    if (step > 0) {
+      setDir(-1);
+      setStep(step - 1);
+    }
+  }, [step]);
+
   const selectAnswer = useCallback(
     (val: string) => {
       const value = q.key === "guests" ? parseInt(val) : q.key === "budget" ? budgetMap[val] || 1 : val;
@@ -65,30 +80,45 @@ const QuizPage = () => {
     [step, answers, navigate, q.key]
   );
 
-  const goBack = () => {
-    if (step > 0) {
-      setDir(-1);
-      setStep(step - 1);
-    }
-  };
-
   return (
     <div className="flex flex-col min-h-screen bg-background px-6 py-6 overflow-hidden">
-      {/* Dinou avatar */}
+      {/* Dinou avatar — large & prominent */}
       <div className="flex flex-col items-center">
-        <img src={dinouLogo} alt="Dinou" className="w-16 h-16 object-contain animate-float" />
+        <img src={dinouLogo} alt="Dinou" className="w-28 h-28 md:w-36 md:h-36 object-contain animate-float" />
         <motion.div
           key={step}
-          className="glass-card rounded-2xl px-4 py-2 mt-2 max-w-xs"
+          className="glass-card rounded-2xl px-5 py-3 mt-3 max-w-sm"
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
         >
-          <p className="text-foreground text-center font-body text-xs">{q.dinouMsg}</p>
+          <p className="text-foreground text-center font-body text-sm md:text-base">{q.dinouMsg}</p>
         </motion.div>
       </div>
 
-      {/* Question */}
-      <div className="flex-1 flex flex-col justify-center relative">
+      {/* Question area with navigation arrows */}
+      <div className="flex-1 flex items-center justify-center relative">
+        {/* Left arrow (desktop) */}
+        {step > 0 && (
+          <button
+            onClick={goBack}
+            className="hidden md:flex absolute left-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 items-center justify-center rounded-full bg-card border border-border text-muted-foreground hover:text-foreground hover:border-accent transition-colors"
+            aria-label="Question précédente"
+          >
+            <ChevronLeft className="h-5 w-5" />
+          </button>
+        )}
+
+        {/* Right arrow (desktop) */}
+        {step < questions.length - 1 && (
+          <button
+            onClick={goNext}
+            className="hidden md:flex absolute right-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 items-center justify-center rounded-full bg-card border border-border text-muted-foreground hover:text-foreground hover:border-accent transition-colors"
+            aria-label="Question suivante"
+          >
+            <ChevronRight className="h-5 w-5" />
+          </button>
+        )}
+
         <AnimatePresence mode="wait" custom={dir}>
           <motion.div
             key={step}
@@ -98,19 +128,18 @@ const QuizPage = () => {
             animate="center"
             exit="exit"
             transition={{ duration: 0.3 }}
-            className="w-full"
+            className="w-full md:px-14"
             drag={!q.isDropdown ? "x" : false}
             dragConstraints={{ left: 0, right: 0 }}
             onDragEnd={(_, info) => {
               if (info.offset.x < -80 && step < questions.length - 1) {
-                setDir(1);
-                setStep(step + 1);
+                goNext();
               } else if (info.offset.x > 80 && step > 0) {
                 goBack();
               }
             }}
           >
-            <h2 className="text-xl font-heading font-semibold text-foreground text-center mb-6">
+            <h2 className="text-2xl md:text-3xl font-heading font-bold text-foreground text-center mb-8">
               {t(q.titleKey)}
             </h2>
 
@@ -152,7 +181,7 @@ const QuizPage = () => {
       {/* Progress bar */}
       <div className="mt-auto">
         {step > 0 && (
-          <button onClick={goBack} className="text-muted-foreground text-sm font-body mb-3">
+          <button onClick={goBack} className="text-muted-foreground text-sm font-body mb-3 md:hidden">
             ← Retour
           </button>
         )}
