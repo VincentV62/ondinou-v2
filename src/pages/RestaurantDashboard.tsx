@@ -198,7 +198,44 @@ export default function RestaurantDashboard() {
     : "—";
 
   const superfans = reservations.filter(r => r.review && r.review.rating >= 4).length;
-  const weeklyData = buildWeeklyData(reservations);
+
+  // Chart drill-down state: null = monthly, number = month selected, [month, week] = week selected
+  const [selectedMonth, setSelectedMonth] = useState<number | null>(null);
+  const [selectedWeek, setSelectedWeek] = useState<string | null>(null);
+
+  const monthlyData = useMemo(() => buildMonthlyData(reservations), [reservations]);
+
+  const chartData = useMemo(() => {
+    if (selectedMonth !== null && selectedWeek !== null) {
+      return getDaysOfWeek(reservations, selectedMonth, selectedWeek);
+    }
+    if (selectedMonth !== null) {
+      return getWeeksOfMonth(reservations, selectedMonth);
+    }
+    return monthlyData;
+  }, [reservations, selectedMonth, selectedWeek, monthlyData]);
+
+  const chartTitle = selectedMonth !== null && selectedWeek !== null
+    ? `${MONTH_NAMES[selectedMonth]} — ${selectedWeek}`
+    : selectedMonth !== null
+      ? `Semaines de ${MONTH_NAMES[selectedMonth]}`
+      : "Réservations par mois";
+
+  const handleBarClick = (data: any) => {
+    if (selectedMonth === null) {
+      setSelectedMonth(data.monthIndex);
+    } else if (selectedWeek === null && data.label) {
+      setSelectedWeek(data.label);
+    }
+  };
+
+  const handleChartBack = () => {
+    if (selectedWeek !== null) {
+      setSelectedWeek(null);
+    } else {
+      setSelectedMonth(null);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -233,22 +270,33 @@ export default function RestaurantDashboard() {
           ))}
         </motion.div>
 
-        {/* Chart */}
+        {/* Chart with drill-down */}
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
           <Card className="glass-card">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-base font-heading">Réservations par semaine</CardTitle>
+            <CardHeader className="pb-2 flex flex-row items-center gap-2">
+              {selectedMonth !== null && (
+                <Button variant="ghost" size="icon" onClick={handleChartBack} className="h-7 w-7">
+                  <ChevronLeft className="h-4 w-4" />
+                </Button>
+              )}
+              <CardTitle className="text-base font-heading">{chartTitle}</CardTitle>
             </CardHeader>
             <CardContent>
               <ChartContainer config={chartConfig} className="h-[200px] w-full">
-                <BarChart data={weeklyData}>
+                <BarChart data={chartData} onClick={(e) => e?.activePayload && handleBarClick(e.activePayload[0].payload)}>
                   <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
-                  <XAxis dataKey="day" className="text-xs" />
+                  <XAxis dataKey="label" className="text-xs" />
                   <YAxis allowDecimals={false} className="text-xs" />
                   <ChartTooltip content={<ChartTooltipContent />} />
-                  <Bar dataKey="reservations" fill="hsl(var(--accent))" radius={[6, 6, 0, 0]} />
+                  <Bar dataKey="reservations" fill="hsl(var(--accent))" radius={[6, 6, 0, 0]} className="cursor-pointer" />
                 </BarChart>
               </ChartContainer>
+              {selectedMonth === null && (
+                <p className="text-xs text-muted-foreground text-center mt-1">Cliquez sur un mois pour voir les semaines</p>
+              )}
+              {selectedMonth !== null && selectedWeek === null && (
+                <p className="text-xs text-muted-foreground text-center mt-1">Cliquez sur une semaine pour voir les jours</p>
+              )}
             </CardContent>
           </Card>
         </motion.div>
