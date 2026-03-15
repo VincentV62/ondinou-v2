@@ -10,14 +10,7 @@ const ResultPage = () => {
   const navigate = useNavigate();
   const [index, setIndex] = useState(0);
 
-  // Try fetching from Supabase, fallback to local mock
-  const { data: dbRestaurants } = useQuery({
-    queryKey: ["restaurants"],
-    queryFn: async () => {
-      const { data } = await supabase.from("restaurants").select("*");
-      return data;
-    },
-  });
+
 
   const results = useMemo(() => {
     try {
