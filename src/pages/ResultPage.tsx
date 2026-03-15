@@ -130,34 +130,25 @@ const ResultPage = () => {
       </motion.div>
 
       <div className="mt-6 space-y-3 max-w-sm mx-auto w-full pb-6">
-        {reserved ? (
-          <div className="text-center">
-            <p className="text-foreground font-heading font-semibold text-lg">✅ Réservé !</p>
-            <button onClick={() => navigate("/")} className="mt-3 px-6 py-3 rounded-full bg-accent text-accent-foreground font-heading font-semibold">
-              Retour à l'accueil
-            </button>
-          </div>
-        ) : (
-          <>
-            <button
-              onClick={handleReserve}
-              disabled={reserving}
-              className="w-full py-3 rounded-full bg-accent text-accent-foreground font-heading font-semibold shadow-lg disabled:opacity-50"
-            >
-              {reserving ? "Réservation..." : t("reserve")}
-            </button>
-            <button className="w-full py-3 rounded-full bg-card text-card-foreground border border-border font-heading font-medium">
-              {t("view_map")}
-            </button>
-            {index < results.length - 1 && (
-              <button
-                onClick={() => setIndex(index + 1)}
-                className="w-full py-3 rounded-full bg-muted text-muted-foreground font-heading font-medium"
-              >
-                {t("change")}
-              </button>
-            )}
-          </>
+        <button
+          onClick={handleReserve}
+          className="w-full py-3 rounded-full bg-accent text-accent-foreground font-heading font-semibold shadow-lg"
+        >
+          {t("reserve")}
+        </button>
+        <button
+          onClick={handleViewMap}
+          className="w-full py-3 rounded-full bg-card text-card-foreground border border-border font-heading font-medium"
+        >
+          {t("view_map")}
+        </button>
+        {index < results.length - 1 && (
+          <button
+            onClick={() => setIndex(index + 1)}
+            className="w-full py-3 rounded-full bg-muted text-muted-foreground font-heading font-medium"
+          >
+            {t("change")}
+          </button>
         )}
       </div>
     </div>
