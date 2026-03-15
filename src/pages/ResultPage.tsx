@@ -11,8 +11,6 @@ import { t } from "@/data/i18n";
 const ResultPage = () => {
   const navigate = useNavigate();
   const [index, setIndex] = useState(0);
-  const [reserving, setReserving] = useState(false);
-  const [reserved, setReserved] = useState(false);
 
   // Try fetching from Supabase, fallback to local mock
   const { data: dbRestaurants } = useQuery({
