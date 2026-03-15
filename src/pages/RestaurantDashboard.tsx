@@ -31,16 +31,58 @@ const EMOJI_MAP: Record<number, string> = {
   1: "😢", 2: "😕", 3: "🙂", 4: "😄", 5: "🤩",
 };
 
-// Demo data for chart (weekly reservations)
-function buildWeeklyData(reservations: ReservationRow[]) {
+const MONTH_NAMES = ["Jan", "Fév", "Mar", "Avr", "Mai", "Juin", "Juil", "Aoû", "Sep", "Oct", "Nov", "Déc"];
+
+function buildMonthlyData(reservations: ReservationRow[]) {
+  const counts = new Array(12).fill(0);
+  reservations.forEach((r) => {
+    const m = new Date(r.date).getMonth();
+    counts[m]++;
+  });
+  return MONTH_NAMES.map((month, i) => ({ label: month, reservations: counts[i], monthIndex: i }));
+}
+
+function getWeeksOfMonth(reservations: ReservationRow[], monthIndex: number) {
+  const year = new Date().getFullYear();
+  const filtered = reservations.filter((r) => {
+    const d = new Date(r.date);
+    return d.getMonth() === monthIndex && d.getFullYear() === year;
+  });
+
+  const weekMap: Record<string, { label: string; reservations: number; weekStart: string }> = {};
+  filtered.forEach((r) => {
+    const d = new Date(r.date);
+    const day = d.getDate();
+    const weekNum = Math.ceil(day / 7);
+    const key = `S${weekNum}`;
+    if (!weekMap[key]) {
+      weekMap[key] = { label: key, reservations: 0, weekStart: r.date };
+    }
+    weekMap[key].reservations++;
+  });
+
+  const weeks = Object.values(weekMap).sort((a, b) => a.label.localeCompare(b.label));
+  return weeks.length ? weeks : [{ label: "S1", reservations: 0, weekStart: "" }];
+}
+
+function getDaysOfWeek(reservations: ReservationRow[], monthIndex: number, weekLabel: string) {
+  const year = new Date().getFullYear();
+  const weekNum = parseInt(weekLabel.replace("S", ""));
   const days = ["Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"];
   const counts = new Array(7).fill(0);
+
   reservations.forEach((r) => {
-    const d = new Date(r.date).getDay();
-    const idx = d === 0 ? 6 : d - 1;
-    counts[idx]++;
+    const d = new Date(r.date);
+    if (d.getMonth() === monthIndex && d.getFullYear() === year) {
+      const dayOfMonth = d.getDate();
+      if (Math.ceil(dayOfMonth / 7) === weekNum) {
+        const idx = d.getDay() === 0 ? 6 : d.getDay() - 1;
+        counts[idx]++;
+      }
+    }
   });
-  return days.map((day, i) => ({ day, reservations: counts[i] }));
+
+  return days.map((day, i) => ({ label: day, reservations: counts[i] }));
 }
 
 function exportCSV(reservations: ReservationRow[]) {
