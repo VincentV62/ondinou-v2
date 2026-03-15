@@ -2,10 +2,8 @@ import { useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { Star, MapPin, Users, Clock } from "lucide-react";
-import { useQuery } from "@tanstack/react-query";
 import dinouLogo from "@/assets/dinou-logo.png";
 import { matchRestaurants, type QuizAnswers, type Restaurant } from "@/data/restaurants";
-import { supabase } from "@/integrations/supabase/client";
 import { t } from "@/data/i18n";
 
 const ResultPage = () => {
