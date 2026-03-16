@@ -21,17 +21,21 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<SplashScreen />} />
-          <Route path="/auth" element={<AuthPage />} />
-          <Route path="/geolocation" element={<GeolocationPage />} />
-          <Route path="/reservation" element={<ReservationPage />} />
-          <Route path="/quiz" element={<QuizPage />} />
-          <Route path="/result" element={<ResultPage />} />
-          <Route path="/restaurant-signup" element={<RestaurantSignup />} />
-          <Route path="/restaurant-dashboard" element={<RestaurantDashboard />} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
+        <div className="min-h-screen bg-background p-2 sm:p-4 md:p-6">
+          <div className="min-h-[calc(100dvh-1rem)] sm:min-h-[calc(100dvh-2rem)] md:min-h-[calc(100dvh-3rem)] rounded-2xl border-[3px] border-primary overflow-hidden">
+            <Routes>
+              <Route path="/" element={<SplashScreen />} />
+              <Route path="/auth" element={<AuthPage />} />
+              <Route path="/geolocation" element={<GeolocationPage />} />
+              <Route path="/reservation" element={<ReservationPage />} />
+              <Route path="/quiz" element={<QuizPage />} />
+              <Route path="/result" element={<ResultPage />} />
+              <Route path="/restaurant-signup" element={<RestaurantSignup />} />
+              <Route path="/restaurant-dashboard" element={<RestaurantDashboard />} />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </div>
+        </div>
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
