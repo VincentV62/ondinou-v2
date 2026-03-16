@@ -59,16 +59,27 @@ const ResultPage = () => {
   return (
     <div className="flex flex-col min-h-screen bg-background px-6 py-6">
       <div className="flex flex-col items-center">
-        <img src={dinouLogo} alt="Dinou" className="w-14 h-14 object-contain animate-float" />
-        <motion.div
-          className="glass-card rounded-2xl px-4 py-2 mt-2"
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-        >
-          <p className="text-foreground text-center font-body text-xs">
-            J'ai trouvé le spot parfait pour toi ! 🎉
-          </p>
-        </motion.div>
+        <img
+          src={dinouLogo}
+          alt="Dinou"
+          className="w-20 h-20 object-contain animate-float cursor-pointer"
+          onClick={() => navigate("/")}
+        />
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={showChangeMsg ? "change" : "default"}
+            className="glass-card rounded-2xl px-5 py-3 mt-2"
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.9 }}
+          >
+            <p className="text-foreground text-center font-body text-sm">
+              {showChangeMsg
+                ? "Ok, on recommence, on va trouver ce qu'il te faut ! 🔄"
+                : "J'ai trouvé le spot parfait pour toi ! 🎉"}
+            </p>
+          </motion.div>
+        </AnimatePresence>
       </div>
 
       <h1 className="text-xl font-heading font-semibold text-foreground text-center mt-6">
