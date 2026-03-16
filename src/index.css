@@ -87,3 +87,20 @@
     filter: drop-shadow(0 0 20px hsl(var(--accent) / 0.4));
   }
 }
+
+/* Stylised background with brand colors */
+.bg-background {
+  background:
+    radial-gradient(ellipse 80% 60% at 10% 90%, hsl(var(--sage) / 0.12) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 50% at 90% 15%, hsl(var(--copper) / 0.10) 0%, transparent 55%),
+    radial-gradient(ellipse 50% 40% at 50% 50%, hsl(var(--night) / 0.04) 0%, transparent 70%),
+    hsl(var(--background));
+}
+
+.dark .bg-background {
+  background:
+    radial-gradient(ellipse 80% 60% at 10% 90%, hsl(var(--sage) / 0.06) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 50% at 90% 15%, hsl(var(--copper) / 0.08) 0%, transparent 55%),
+    radial-gradient(ellipse 50% 40% at 50% 50%, hsl(var(--night) / 0.15) 0%, transparent 70%),
+    hsl(var(--background));
+}
