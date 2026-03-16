@@ -7,17 +7,17 @@ const SplashScreen = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-background px-6">
+    <div className="flex flex-col items-center justify-center h-[100dvh] bg-background px-6 overflow-hidden">
       <motion.img
         src={dinouLogo}
         alt="Dinou"
-        className="w-48 h-48 object-contain animate-glow-pulse"
+        className="w-40 h-40 sm:w-48 sm:h-48 object-contain animate-glow-pulse"
         initial={{ scale: 0.5, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         transition={{ type: "spring", stiffness: 200, damping: 15, duration: 0.8 }}
       />
       <motion.p
-        className="mt-8 text-center text-lg font-body text-foreground leading-relaxed whitespace-pre-line max-w-xs"
+        className="mt-6 text-center text-base sm:text-lg font-body text-foreground leading-relaxed whitespace-pre-line max-w-xs"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.5, duration: 0.6 }}
@@ -26,7 +26,7 @@ const SplashScreen = () => {
       </motion.p>
       <motion.button
         onClick={() => navigate("/auth")}
-        className="mt-10 px-8 py-4 rounded-full bg-accent text-accent-foreground font-heading font-semibold text-lg shadow-lg hover:shadow-xl transition-shadow"
+        className="mt-8 px-8 py-4 rounded-full bg-accent text-accent-foreground font-heading font-semibold text-lg shadow-lg hover:shadow-xl transition-shadow"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.9, duration: 0.5 }}
@@ -36,7 +36,7 @@ const SplashScreen = () => {
       </motion.button>
       <motion.button
         onClick={() => navigate("/restaurant-signup")}
-        className="mt-4 px-6 py-3 rounded-full bg-primary text-primary-foreground font-heading font-semibold text-sm shadow-md hover:shadow-lg transition-shadow"
+        className="mt-3 px-6 py-3 rounded-full bg-primary text-primary-foreground font-heading font-semibold text-sm shadow-md hover:shadow-lg transition-shadow"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 1.1, duration: 0.5 }}

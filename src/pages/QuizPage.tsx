@@ -1,6 +1,6 @@
 import { useState, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { t } from "@/data/i18n";
 import dinouLogo from "@/assets/dinou-logo.png";
@@ -19,7 +19,7 @@ const questions: QuestionDef[] = [
   { key: "transport", titleKey: "q2", options: ["À pied", "En vélo", "En voiture", "En transports"], dinouMsg: "Super ! On continue…" },
   { key: "travelTime", titleKey: "q3", options: ["5 minutes", "15 minutes", "30 minutes", "Peu importe"], dinouMsg: "Hum… je commence à avoir une idée… 🤔" },
   { key: "budget", titleKey: "q4", options: ["Menu à 20€ environ", "Menu entre 30€ et 50€", "Pas de limite, ce soir je me fais plaisir !"], dinouMsg: "Ça se précise…" },
-  { key: "food", titleKey: "q5", options: ["Viande", "Poisson", "Vegan", "Surprise-moi"], dinouMsg: "Miam miam 😋" },
+  { key: "food", titleKey: "q5", options: ["Viande", "Poisson", "Vegan", "Surprends-moi"], dinouMsg: "Miam miam 😋" },
   { key: "ambiance", titleKey: "q6", options: ["Cosy", "Branché", "Romantique", "Entre potes"], dinouMsg: "J'adore ton style !" },
   { key: "terrasse", titleKey: "q7", options: ["Oui", "Non", "Peu importe"], dinouMsg: "Bonne question…" },
   { key: "novelty", titleKey: "q8", options: ["Nouveau", "Classique"], dinouMsg: "Encore une question et je te trouve le restaurant parfait ! 🎯" },
@@ -40,9 +40,12 @@ const slideVariants = {
 
 const QuizPage = () => {
   const navigate = useNavigate();
-  const [step, setStep] = useState(0);
+  const [searchParams] = useSearchParams();
+  const startStep = searchParams.get("step") ? parseInt(searchParams.get("step")!) : 0;
+  const [step, setStep] = useState(startStep);
   const [dir, setDir] = useState(1);
-  const [answers, setAnswers] = useState<Partial<QuizAnswers>>({});
+  const savedAnswers = startStep > 0 ? JSON.parse(sessionStorage.getItem("quizAnswers") || "{}") : {};
+  const [answers, setAnswers] = useState<Partial<QuizAnswers>>(savedAnswers);
 
   const q = questions[step];
   const progress = ((step + 1) / questions.length) * 100;
@@ -84,14 +87,19 @@ const QuizPage = () => {
     <div className="flex flex-col min-h-screen bg-background px-6 py-6 overflow-hidden">
       {/* Dinou avatar — large & prominent */}
       <div className="flex flex-col items-center">
-        <img src={dinouLogo} alt="Dinou" className="w-28 h-28 md:w-36 md:h-36 object-contain animate-float" />
+        <img
+          src={dinouLogo}
+          alt="Dinou"
+          className="w-36 h-36 md:w-44 md:h-44 object-contain animate-float cursor-pointer"
+          onClick={() => navigate("/")}
+        />
         <motion.div
           key={step}
-          className="glass-card rounded-2xl px-5 py-3 mt-3 max-w-sm"
+          className="glass-card rounded-2xl px-6 py-4 mt-3 max-w-md"
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
         >
-          <p className="text-foreground text-center font-body text-sm md:text-base">{q.dinouMsg}</p>
+          <p className="text-foreground text-center font-body text-base md:text-lg">{q.dinouMsg}</p>
         </motion.div>
       </div>
 
