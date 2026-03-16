@@ -87,14 +87,19 @@ const QuizPage = () => {
     <div className="flex flex-col min-h-screen bg-background px-6 py-6 overflow-hidden">
       {/* Dinou avatar — large & prominent */}
       <div className="flex flex-col items-center">
-        <img src={dinouLogo} alt="Dinou" className="w-28 h-28 md:w-36 md:h-36 object-contain animate-float" />
+        <img
+          src={dinouLogo}
+          alt="Dinou"
+          className="w-36 h-36 md:w-44 md:h-44 object-contain animate-float cursor-pointer"
+          onClick={() => navigate("/")}
+        />
         <motion.div
           key={step}
-          className="glass-card rounded-2xl px-5 py-3 mt-3 max-w-sm"
+          className="glass-card rounded-2xl px-6 py-4 mt-3 max-w-md"
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
         >
-          <p className="text-foreground text-center font-body text-sm md:text-base">{q.dinouMsg}</p>
+          <p className="text-foreground text-center font-body text-base md:text-lg">{q.dinouMsg}</p>
         </motion.div>
       </div>
 

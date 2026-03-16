@@ -152,14 +152,13 @@ const ResultPage = () => {
         >
           {t("view_map")}
         </button>
-        {index < results.length - 1 && (
-          <button
-            onClick={() => setIndex(index + 1)}
-            className="w-full py-3 rounded-full bg-muted text-muted-foreground font-heading font-medium"
-          >
-            {t("change")}
-          </button>
-        )}
+        <button
+          onClick={handleChangeRestaurant}
+          disabled={showChangeMsg}
+          className="w-full py-3 rounded-full bg-muted text-muted-foreground font-heading font-medium disabled:opacity-50"
+        >
+          Je souhaite une autre adresse
+        </button>
       </div>
     </div>
   );
