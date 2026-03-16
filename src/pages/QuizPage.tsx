@@ -40,9 +40,12 @@ const slideVariants = {
 
 const QuizPage = () => {
   const navigate = useNavigate();
-  const [step, setStep] = useState(0);
+  const [searchParams] = useSearchParams();
+  const startStep = searchParams.get("step") ? parseInt(searchParams.get("step")!) : 0;
+  const [step, setStep] = useState(startStep);
   const [dir, setDir] = useState(1);
-  const [answers, setAnswers] = useState<Partial<QuizAnswers>>({});
+  const savedAnswers = startStep > 0 ? JSON.parse(sessionStorage.getItem("quizAnswers") || "{}") : {};
+  const [answers, setAnswers] = useState<Partial<QuizAnswers>>(savedAnswers);
 
   const q = questions[step];
   const progress = ((step + 1) / questions.length) * 100;
