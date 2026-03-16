@@ -9,6 +9,14 @@ import { t } from "@/data/i18n";
 const ResultPage = () => {
   const navigate = useNavigate();
   const [index, setIndex] = useState(0);
+  const [showChangeMsg, setShowChangeMsg] = useState(false);
+
+  const handleChangeRestaurant = useCallback(() => {
+    setShowChangeMsg(true);
+    setTimeout(() => {
+      navigate("/quiz?step=3");
+    }, 1800);
+  }, [navigate]);
 
 
 
