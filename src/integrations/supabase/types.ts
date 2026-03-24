@@ -78,6 +78,7 @@ export type Database = {
       }
       reservations: {
         Row: {
+          client_note: string | null
           created_at: string
           date: string
           guests: number
@@ -89,6 +90,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          client_note?: string | null
           created_at?: string
           date: string
           guests?: number
@@ -100,6 +102,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          client_note?: string | null
           created_at?: string
           date?: string
           guests?: number
