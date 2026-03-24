@@ -30,9 +30,10 @@ const ReservationPage = () => {
       <motion.img
         src={dinouLogo}
         alt="Dinou"
-        className="w-20 h-20 object-contain mx-auto animate-float"
+        className="w-20 h-20 object-contain mx-auto animate-float cursor-pointer"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
+        onClick={() => navigate("/")}
       />
       <motion.div
         className="glass-card rounded-2xl p-4 mx-auto mt-4 max-w-xs"
