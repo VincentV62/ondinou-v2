@@ -26,9 +26,18 @@ interface ReservationRow {
   status: string | null;
   user_id: string;
   restaurant_id: string;
+  client_note: string | null;
   profile?: { first_name: string | null; last_name: string | null } | null;
   review?: { rating: number; text: string | null } | null;
 }
+
+const CLIENT_NOTE_OPTIONS = [
+  { value: "noir", label: "Noir", color: "#1a1a1a" },
+  { value: "rouge", label: "Rouge", color: "#dc2626" },
+  { value: "orange", label: "Orange", color: "#f97316" },
+  { value: "vert", label: "Vert", color: "#22c55e" },
+  { value: "soleil", label: "☀️", color: null },
+];
 
 const EMOJI_MAP: Record<number, string> = {
   1: "😢", 2: "😕", 3: "🙂", 4: "😄", 5: "🤩",
