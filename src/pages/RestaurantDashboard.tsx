@@ -341,19 +341,20 @@ export default function RestaurantDashboard() {
                   <Table>
                     <TableHeader>
                       <TableRow>
-                        <TableHead>Date</TableHead>
-                        <TableHead>Heure</TableHead>
+                        <TableHead>Date & Heure</TableHead>
                         <TableHead>Client</TableHead>
                         <TableHead className="text-center">Couverts</TableHead>
-                        <TableHead className="text-center">Avis</TableHead>
-                        <TableHead className="text-center">Superfan</TableHead>
+                        <TableHead className="text-center">Note laissée</TableHead>
+                        <TableHead className="text-center">Note du client</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
                       {reservations.map((r) => (
                         <TableRow key={r.id}>
-                          <TableCell className="whitespace-nowrap">{new Date(r.date).toLocaleDateString("fr-FR", { day: "2-digit", month: "2-digit" })}</TableCell>
-                          <TableCell>{r.time}</TableCell>
+                          <TableCell className="whitespace-nowrap">
+                            {new Date(r.date).toLocaleDateString("fr-FR", { day: "2-digit", month: "2-digit", year: "numeric" })}
+                            {" — "}{r.time}
+                          </TableCell>
                           <TableCell>
                             {r.profile
                               ? `${r.profile.first_name || ""} ${r.profile.last_name || ""}`.trim() || "—"
@@ -361,10 +362,47 @@ export default function RestaurantDashboard() {
                           </TableCell>
                           <TableCell className="text-center">{r.guests}</TableCell>
                           <TableCell className="text-center">
-                            {r.review ? EMOJI_MAP[r.review.rating] || `${r.review.rating}/5` : "—"}
+                            {r.review ? (
+                              <span title={r.review.text || ""}>
+                                {EMOJI_MAP[r.review.rating] || `${r.review.rating}/5`}
+                              </span>
+                            ) : "—"}
                           </TableCell>
                           <TableCell className="text-center">
-                            {r.review && r.review.rating >= 4 ? "⭐" : ""}
+                            <Select
+                              value={r.client_note || "vert"}
+                              onValueChange={(v) => handleClientNoteChange(r.id, v)}
+                            >
+                              <SelectTrigger className="w-[100px] mx-auto h-8 text-xs">
+                                <SelectValue>
+                                  {(() => {
+                                    const opt = CLIENT_NOTE_OPTIONS.find(o => o.value === (r.client_note || "vert"));
+                                    if (!opt) return "Vert";
+                                    if (opt.value === "soleil") return <Sun className="h-4 w-4 text-amber-400 mx-auto" />;
+                                    return (
+                                      <span className="flex items-center gap-1.5">
+                                        <span className="inline-block w-3 h-3 rounded-full shrink-0" style={{ backgroundColor: opt.color! }} />
+                                        <span>{opt.label}</span>
+                                      </span>
+                                    );
+                                  })()}
+                                </SelectValue>
+                              </SelectTrigger>
+                              <SelectContent>
+                                {CLIENT_NOTE_OPTIONS.map((opt) => (
+                                  <SelectItem key={opt.value} value={opt.value}>
+                                    <span className="flex items-center gap-2">
+                                      {opt.value === "soleil" ? (
+                                        <Sun className="h-4 w-4 text-amber-400" />
+                                      ) : (
+                                        <span className="inline-block w-3 h-3 rounded-full shrink-0" style={{ backgroundColor: opt.color! }} />
+                                      )}
+                                      <span>{opt.label}</span>
+                                    </span>
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
                           </TableCell>
                         </TableRow>
                       ))}
