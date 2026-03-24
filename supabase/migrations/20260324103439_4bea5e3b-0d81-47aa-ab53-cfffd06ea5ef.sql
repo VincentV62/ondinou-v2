@@ -1,0 +1,1 @@
+ALTER TABLE public.reservations ADD COLUMN client_note text DEFAULT 'vert';

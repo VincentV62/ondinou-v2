@@ -3,13 +3,16 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { motion } from "framer-motion";
 import {
-  Users, CalendarCheck, Star, Heart, Download, ArrowLeft, ChevronLeft,
+  Users, CalendarCheck, Star, Heart, Download, ArrowLeft, ChevronLeft, Sun,
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
+import {
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+} from "@/components/ui/select";
 import {
   ChartContainer, ChartTooltip, ChartTooltipContent,
 } from "@/components/ui/chart";
@@ -23,9 +26,18 @@ interface ReservationRow {
   status: string | null;
   user_id: string;
   restaurant_id: string;
+  client_note: string | null;
   profile?: { first_name: string | null; last_name: string | null } | null;
   review?: { rating: number; text: string | null } | null;
 }
+
+const CLIENT_NOTE_OPTIONS = [
+  { value: "noir", label: "Noir", color: "#1a1a1a" },
+  { value: "rouge", label: "Rouge", color: "#dc2626" },
+  { value: "orange", label: "Orange", color: "#f97316" },
+  { value: "vert", label: "Vert", color: "#22c55e" },
+  { value: "soleil", label: "☀️", color: null },
+];
 
 const EMOJI_MAP: Record<number, string> = {
   1: "😢", 2: "😕", 3: "🙂", 4: "😄", 5: "🤩",
@@ -115,6 +127,13 @@ export default function RestaurantDashboard() {
   const [reservations, setReservations] = useState<ReservationRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [restaurantName, setRestaurantName] = useState("Mon restaurant");
+
+  const handleClientNoteChange = async (reservationId: string, value: string) => {
+    await supabase.from("reservations").update({ client_note: value } as any).eq("id", reservationId);
+    setReservations((prev) =>
+      prev.map((r) => (r.id === reservationId ? { ...r, client_note: value } : r))
+    );
+  };
 
   useEffect(() => {
     async function load() {
@@ -322,19 +341,20 @@ export default function RestaurantDashboard() {
                   <Table>
                     <TableHeader>
                       <TableRow>
-                        <TableHead>Date</TableHead>
-                        <TableHead>Heure</TableHead>
+                        <TableHead>Date & Heure</TableHead>
                         <TableHead>Client</TableHead>
                         <TableHead className="text-center">Couverts</TableHead>
-                        <TableHead className="text-center">Avis</TableHead>
-                        <TableHead className="text-center">Superfan</TableHead>
+                        <TableHead className="text-center">Note laissée</TableHead>
+                        <TableHead className="text-center">Note du client</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
                       {reservations.map((r) => (
                         <TableRow key={r.id}>
-                          <TableCell className="whitespace-nowrap">{new Date(r.date).toLocaleDateString("fr-FR", { day: "2-digit", month: "2-digit" })}</TableCell>
-                          <TableCell>{r.time}</TableCell>
+                          <TableCell className="whitespace-nowrap">
+                            {new Date(r.date).toLocaleDateString("fr-FR", { day: "2-digit", month: "2-digit", year: "numeric" })}
+                            {" — "}{r.time}
+                          </TableCell>
                           <TableCell>
                             {r.profile
                               ? `${r.profile.first_name || ""} ${r.profile.last_name || ""}`.trim() || "—"
@@ -342,10 +362,47 @@ export default function RestaurantDashboard() {
                           </TableCell>
                           <TableCell className="text-center">{r.guests}</TableCell>
                           <TableCell className="text-center">
-                            {r.review ? EMOJI_MAP[r.review.rating] || `${r.review.rating}/5` : "—"}
+                            {r.review ? (
+                              <span title={r.review.text || ""}>
+                                {EMOJI_MAP[r.review.rating] || `${r.review.rating}/5`}
+                              </span>
+                            ) : "—"}
                           </TableCell>
                           <TableCell className="text-center">
-                            {r.review && r.review.rating >= 4 ? "⭐" : ""}
+                            <Select
+                              value={r.client_note || "vert"}
+                              onValueChange={(v) => handleClientNoteChange(r.id, v)}
+                            >
+                              <SelectTrigger className="w-[100px] mx-auto h-8 text-xs">
+                                <SelectValue>
+                                  {(() => {
+                                    const opt = CLIENT_NOTE_OPTIONS.find(o => o.value === (r.client_note || "vert"));
+                                    if (!opt) return "Vert";
+                                    if (opt.value === "soleil") return <Sun className="h-4 w-4 text-amber-400 mx-auto" />;
+                                    return (
+                                      <span className="flex items-center gap-1.5">
+                                        <span className="inline-block w-3 h-3 rounded-full shrink-0" style={{ backgroundColor: opt.color! }} />
+                                        <span>{opt.label}</span>
+                                      </span>
+                                    );
+                                  })()}
+                                </SelectValue>
+                              </SelectTrigger>
+                              <SelectContent>
+                                {CLIENT_NOTE_OPTIONS.map((opt) => (
+                                  <SelectItem key={opt.value} value={opt.value}>
+                                    <span className="flex items-center gap-2">
+                                      {opt.value === "soleil" ? (
+                                        <Sun className="h-4 w-4 text-amber-400" />
+                                      ) : (
+                                        <span className="inline-block w-3 h-3 rounded-full shrink-0" style={{ backgroundColor: opt.color! }} />
+                                      )}
+                                      <span>{opt.label}</span>
+                                    </span>
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
                           </TableCell>
                         </TableRow>
                       ))}
