@@ -201,9 +201,23 @@ export default function RestaurantDashboard() {
         const profileMap = new Map((profilesRes.data || []).map(p => [p.user_id, p]));
         const reviewMap = new Map((reviewsRes.data || []).map(r => [r.reservation_id, r]));
 
-        setReservations(resData.map(r => ({
+        // Demo fake names to differentiate reservations from the same user
+        const DEMO_NAMES = [
+          { first_name: "Marie", last_name: "Dupont" },
+          { first_name: "Thomas", last_name: "Lefebvre" },
+          { first_name: "Camille", last_name: "Bernard" },
+          { first_name: "Julien", last_name: "Moreau" },
+          { first_name: "Sophie", last_name: "Durand" },
+          { first_name: "Lucas", last_name: "Petit" },
+          { first_name: "Léa", last_name: "Robert" },
+          { first_name: "Hugo", last_name: "Richard" },
+          { first_name: "Chloé", last_name: "Simon" },
+          { first_name: "Antoine", last_name: "Laurent" },
+        ];
+
+        setReservations(resData.map((r, i) => ({
           ...r,
-          profile: profileMap.get(r.user_id) || null,
+          profile: DEMO_NAMES[i % DEMO_NAMES.length],
           review: reviewMap.get(r.id) || null,
         })));
       }
