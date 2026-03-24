@@ -128,6 +128,13 @@ export default function RestaurantDashboard() {
   const [loading, setLoading] = useState(true);
   const [restaurantName, setRestaurantName] = useState("Mon restaurant");
 
+  const handleClientNoteChange = async (reservationId: string, value: string) => {
+    await supabase.from("reservations").update({ client_note: value } as any).eq("id", reservationId);
+    setReservations((prev) =>
+      prev.map((r) => (r.id === reservationId ? { ...r, client_note: value } : r))
+    );
+  };
+
   useEffect(() => {
     async function load() {
       const { data: { user } } = await supabase.auth.getUser();
