@@ -291,9 +291,21 @@ export default function RestaurantDashboard() {
             { label: "Clients envoyés ce mois", value: reservations.length, icon: Users, color: "text-secondary" },
             { label: "Réservations ONDINOU", value: reservations.length, icon: CalendarCheck, color: "text-accent" },
             { label: "Note moyenne Dinou", value: avgRating, icon: Star, color: "text-accent" },
-            { label: "Superfans", value: superfans, icon: Heart, color: "text-destructive" },
+            { label: "Superfans", value: superfans, icon: Heart, color: "text-destructive", onClick: () => navigate("/restaurant-superfans") },
           ].map((kpi) => (
-            <Card key={kpi.label} className="glass-card">
+            <Card
+              key={kpi.label}
+              className={`glass-card ${kpi.onClick ? "cursor-pointer transition-transform hover:-translate-y-0.5" : ""}`}
+              onClick={kpi.onClick}
+              role={kpi.onClick ? "button" : undefined}
+              tabIndex={kpi.onClick ? 0 : undefined}
+              onKeyDown={kpi.onClick ? (event) => {
+                if (event.key === "Enter" || event.key === " ") {
+                  event.preventDefault();
+                  kpi.onClick?.();
+                }
+              } : undefined}
+            >
               <CardContent className="p-4 flex flex-col items-center text-center gap-1">
                 <kpi.icon className={`h-6 w-6 ${kpi.color}`} />
                 <span className="text-2xl font-heading font-bold">{kpi.value}</span>
@@ -387,16 +399,18 @@ export default function RestaurantDashboard() {
                               value={r.client_note || "vert"}
                               onValueChange={(v) => handleClientNoteChange(r.id, v)}
                             >
-                              <SelectTrigger className="w-[100px] mx-auto h-8 text-xs">
+                              <SelectTrigger className="w-[72px] mx-auto h-8 justify-center px-2">
                                 <SelectValue>
                                   {(() => {
                                     const opt = CLIENT_NOTE_OPTIONS.find(o => o.value === (r.client_note || "vert"));
-                                    if (!opt) return "Vert";
-                                    if (opt.value === "soleil") return <Sun className="h-4 w-4 text-amber-400 mx-auto" />;
+                                    if (!opt) {
+                                      return <span className="inline-block h-4 w-8 rounded-full bg-secondary" />;
+                                    }
+                                    if (opt.value === "soleil") return <Sun className="h-4 w-4 text-accent mx-auto" />;
                                     return (
-                                      <span className="flex items-center gap-1.5">
-                                        <span className="inline-block w-3 h-3 rounded-full shrink-0" style={{ backgroundColor: opt.color! }} />
-                                        <span>{opt.label}</span>
+                                      <span className="flex items-center justify-center">
+                                        <span className="inline-block h-4 w-8 rounded-full shrink-0 border border-border/60" style={{ backgroundColor: opt.color! }} />
+                                        <span className="sr-only">{opt.label}</span>
                                       </span>
                                     );
                                   })()}
@@ -404,14 +418,19 @@ export default function RestaurantDashboard() {
                               </SelectTrigger>
                               <SelectContent>
                                 {CLIENT_NOTE_OPTIONS.map((opt) => (
-                                  <SelectItem key={opt.value} value={opt.value}>
-                                    <span className="flex items-center gap-2">
+                                  <SelectItem key={opt.value} value={opt.value} aria-label={opt.label}>
+                                    <span className="flex min-w-[44px] items-center justify-center">
                                       {opt.value === "soleil" ? (
-                                        <Sun className="h-4 w-4 text-amber-400" />
+                                        <>
+                                          <Sun className="h-4 w-4 text-accent" />
+                                          <span className="sr-only">{opt.label}</span>
+                                        </>
                                       ) : (
-                                        <span className="inline-block w-3 h-3 rounded-full shrink-0" style={{ backgroundColor: opt.color! }} />
+                                        <>
+                                          <span className="inline-block h-4 w-8 rounded-full shrink-0 border border-border/60" style={{ backgroundColor: opt.color! }} />
+                                          <span className="sr-only">{opt.label}</span>
+                                        </>
                                       )}
-                                      <span>{opt.label}</span>
                                     </span>
                                   </SelectItem>
                                 ))}
