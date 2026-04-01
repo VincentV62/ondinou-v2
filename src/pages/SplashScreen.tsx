@@ -2,9 +2,28 @@ import { motion } from "framer-motion";
 import dinouLogo from "@/assets/dinou-logo.png";
 import { t } from "@/data/i18n";
 import { useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
 
 const SplashScreen = () => {
   const navigate = useNavigate();
+
+  const handleRestaurantEntry = async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+
+    if (!user) {
+      navigate("/restaurant-signup");
+      return;
+    }
+
+    const { data: restaurant } = await supabase
+      .from("restaurants")
+      .select("id")
+      .eq("owner_id", user.id)
+      .limit(1)
+      .maybeSingle();
+
+    navigate(restaurant ? "/restaurant-dashboard" : "/restaurant-signup");
+  };
 
   return (
     <div className="flex flex-col items-center justify-center h-[100dvh] bg-background px-6 overflow-hidden">
@@ -35,7 +54,7 @@ const SplashScreen = () => {
         {t("splash_cta")}
       </motion.button>
       <motion.button
-        onClick={() => navigate("/restaurant-signup")}
+        onClick={handleRestaurantEntry}
         className="mt-3 px-6 py-3 rounded-full bg-primary text-primary-foreground font-heading font-semibold text-sm shadow-md hover:shadow-lg transition-shadow"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}

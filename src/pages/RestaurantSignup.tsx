@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -64,7 +64,7 @@ const RestaurantSignup = () => {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) { setError("Tu dois être connecté."); setLoading(false); return; }
 
-    const { error } = await supabase.from("restaurants").insert({
+    const payload = {
       name: restaurantName.trim(),
       address: restaurantAddress.trim(),
       manager_name: managerName.trim(),
@@ -74,18 +74,45 @@ const RestaurantSignup = () => {
       ambiance: selectedTags.filter((t) => ["Romantique", "Cosy", "Branché", "Familial", "Entre amis"].includes(t)),
       owner_id: user.id,
       city: "Lille",
-    });
+    };
+
+    const { data: existingRestaurant } = await supabase
+      .from("restaurants")
+      .select("id")
+      .eq("owner_id", user.id)
+      .maybeSingle();
+
+    const { error } = existingRestaurant
+      ? await supabase.from("restaurants").update(payload).eq("id", existingRestaurant.id)
+      : await supabase.from("restaurants").insert(payload);
 
     if (error) { setError(error.message); setLoading(false); return; }
     navigate("/restaurant-dashboard");
   };
 
-  // Check if already logged in on mount
-  useState(() => {
-    supabase.auth.getUser().then(({ data: { user } }) => {
-      if (user) setStep("info");
-    });
-  });
+  useEffect(() => {
+    const checkExistingRestaurant = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const { data: existingRestaurant } = await supabase
+        .from("restaurants")
+        .select("id, name, address, manager_name, phone, tags")
+        .eq("owner_id", user.id)
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      if (existingRestaurant) {
+        navigate("/restaurant-dashboard");
+        return;
+      }
+
+      setStep("info");
+    };
+
+    checkExistingRestaurant();
+  }, [navigate]);
 
   const inputClass =
     "w-full px-4 py-3 rounded-xl bg-card text-card-foreground border border-border font-body text-sm focus:outline-none focus:ring-2 focus:ring-accent transition-colors";
