@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import dinouLogo from "@/assets/dinou-logo.png";
-import { Mail, ArrowLeft, Check } from "lucide-react";
+import { ArrowLeft, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const TAGS = [
@@ -36,6 +36,23 @@ const RestaurantSignup = () => {
     );
   };
 
+  const redirectIfRestaurantExists = async (userId: string) => {
+    const { data: existingRestaurant } = await supabase
+      .from("restaurants")
+      .select("id")
+      .eq("owner_id", userId)
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    if (existingRestaurant) {
+      navigate("/restaurant-dashboard");
+      return true;
+    }
+
+    return false;
+  };
+
   const handleAuth = async () => {
     setLoading(true);
     setError("");
@@ -51,8 +68,9 @@ const RestaurantSignup = () => {
       if (error) { setError(error.message); setLoading(false); return; }
       setMessage("Vérifie ton email pour confirmer ton compte, puis connecte-toi !");
     } else {
-      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) { setError(error.message); setLoading(false); return; }
+      if (data.user && await redirectIfRestaurantExists(data.user.id)) { setLoading(false); return; }
       setStep("info");
     }
     setLoading(false);
@@ -95,18 +113,7 @@ const RestaurantSignup = () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
-      const { data: existingRestaurant } = await supabase
-        .from("restaurants")
-        .select("id, name, address, manager_name, phone, tags")
-        .eq("owner_id", user.id)
-        .order("created_at", { ascending: false })
-        .limit(1)
-        .maybeSingle();
-
-      if (existingRestaurant) {
-        navigate("/restaurant-dashboard");
-        return;
-      }
+      if (await redirectIfRestaurantExists(user.id)) return;
 
       setStep("info");
     };
