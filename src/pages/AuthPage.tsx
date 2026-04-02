@@ -52,16 +52,24 @@ const AuthPage = () => {
       <motion.img
         src={dinouLogo}
         alt="Dinou"
-        className="w-20 h-20 object-contain"
+        className="w-32 h-32 sm:w-40 sm:h-40 object-contain"
         initial={{ opacity: 0, scale: 0.8 }}
         animate={{ opacity: 1, scale: 1 }}
       />
-      <h1 className="text-2xl font-heading font-semibold text-foreground mt-4">
-        {mode === "login" ? "Bon retour !" : "Crée ton compte"}
-      </h1>
-      <p className="text-sm text-muted-foreground font-body mt-1">
-        {mode === "login" ? "Connecte-toi pour continuer" : "Rejoins ONDINOU"}
-      </p>
+      {/* Speech bubble */}
+      <motion.div
+        className="relative mt-3 mx-4 max-w-xs bg-card border border-border rounded-2xl px-5 py-3 shadow-md"
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.3 }}
+      >
+        <div className="absolute -top-2 left-1/2 -translate-x-1/2 w-4 h-4 bg-card border-l border-t border-border rotate-45" />
+        <p className="text-sm text-foreground font-body text-center relative z-10">
+          {mode === "login"
+            ? "Salut, je suis Dinou et je vais te trouver le resto dont tu as besoin en quelques clics !"
+            : "Rejoins ONDINOU et trouve ton resto idéal !"}
+        </p>
+      </motion.div>
 
       {message && (
         <div className="mt-4 p-3 rounded-lg bg-secondary/30 text-foreground text-sm font-body max-w-xs text-center">
