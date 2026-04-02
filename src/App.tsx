@@ -13,6 +13,7 @@ import NotFound from "./pages/NotFound";
 import RestaurantDashboard from "./pages/RestaurantDashboard";
 import RestaurantSignup from "./pages/RestaurantSignup";
 import RestaurantSuperfansPage from "./pages/RestaurantSuperfansPage";
+import BottomNav from "./components/BottomNav";
 
 const queryClient = new QueryClient();
 
@@ -23,7 +24,7 @@ const AppShell = () => {
 
   return (
     <div className="min-h-screen bg-background p-2 sm:p-4 md:p-6">
-      <div className={`min-h-[calc(100dvh-1rem)] sm:min-h-[calc(100dvh-2rem)] md:min-h-[calc(100dvh-3rem)] rounded-2xl border-[3px] ${borderClass} shadow-[0_8px_40px_-8px_hsl(var(--night)/0.25)] overflow-hidden transition-colors duration-500`}>
+      <div className={`min-h-[calc(100dvh-1rem)] sm:min-h-[calc(100dvh-2rem)] md:min-h-[calc(100dvh-3rem)] rounded-2xl border-[3px] ${borderClass} shadow-[0_8px_40px_-8px_hsl(var(--night)/0.25)] overflow-hidden transition-colors duration-500 pb-16`}>
         <Routes>
           <Route path="/" element={<SplashScreen />} />
           <Route path="/auth" element={<AuthPage />} />
@@ -37,6 +38,7 @@ const AppShell = () => {
           <Route path="*" element={<NotFound />} />
         </Routes>
       </div>
+      <BottomNav />
     </div>
   );
 };
