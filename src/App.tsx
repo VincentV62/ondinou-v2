@@ -13,7 +13,8 @@ import NotFound from "./pages/NotFound";
 import RestaurantDashboard from "./pages/RestaurantDashboard";
 import RestaurantSignup from "./pages/RestaurantSignup";
 import RestaurantSuperfansPage from "./pages/RestaurantSuperfansPage";
-import GamificationPage from "./pages/GamificationPage";
+import ProfilePage from "./pages/ProfilePage";
+import PointsPage from "./pages/PointsPage";
 import BottomNav from "./components/BottomNav";
 
 const queryClient = new QueryClient();
