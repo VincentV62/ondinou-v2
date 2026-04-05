@@ -194,6 +194,13 @@ const AuthPage = () => {
       >
         Continuer sans compte →
       </button>
+
+      <button
+        onClick={() => navigate("/restaurant-signup")}
+        className="mt-2 text-xs font-body font-semibold text-[hsl(var(--night-blue))] underline"
+      >
+        Je suis restaurateur
+      </button>
     </div>
   );
 };
