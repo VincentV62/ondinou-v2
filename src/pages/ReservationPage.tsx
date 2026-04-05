@@ -93,7 +93,7 @@ const ReservationPage = () => {
             <Clock className="w-5 h-5 text-accent" />
             <span className="font-heading font-medium text-foreground text-sm">Heure</span>
           </div>
-          <div className="grid grid-cols-4 gap-2 max-h-[60vh] overflow-y-auto pr-1 -webkit-overflow-scrolling-touch">
+          <div className="grid grid-cols-4 gap-2 max-h-[60vh] overflow-y-auto overscroll-contain pr-1" style={{ WebkitOverflowScrolling: 'touch' }}>
             {times.map((t) => (
               <button
                 key={t}
