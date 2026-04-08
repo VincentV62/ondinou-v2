@@ -152,7 +152,7 @@ const QuizPage = () => {
             </h2>
 
             {q.isDropdown ? (
-              <div className="max-w-xs mx-auto">
+              <div className="max-w-xs mx-auto space-y-4">
                 <select
                   onChange={(e) => selectAnswer(e.target.value)}
                   defaultValue=""
@@ -163,6 +163,18 @@ const QuizPage = () => {
                     <option key={o} value={o}>{o}</option>
                   ))}
                 </select>
+                {q.key === "guests" && (
+                  <div className="space-y-3 pt-2">
+                    <label className="flex items-center justify-between gap-3 cursor-pointer">
+                      <span className="font-body text-sm text-foreground">Besoin de chaise haute pour enfant</span>
+                      <input type="checkbox" className="h-5 w-5 rounded border-border accent-[hsl(var(--accent))] cursor-pointer" />
+                    </label>
+                    <label className="flex items-center justify-between gap-3 cursor-pointer">
+                      <span className="font-body text-sm text-foreground">Besoin de table à langer</span>
+                      <input type="checkbox" className="h-5 w-5 rounded border-border accent-[hsl(var(--accent))] cursor-pointer" />
+                    </label>
+                  </div>
+                )}
               </div>
             ) : (
               <div className="space-y-3 max-w-xs mx-auto">
