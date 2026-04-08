@@ -12,6 +12,7 @@ interface QuestionDef {
   options: string[];
   dinouMsg: string;
   isDropdown?: boolean;
+  isGrid?: boolean;
 }
 
 const questions: QuestionDef[] = [
@@ -19,7 +20,7 @@ const questions: QuestionDef[] = [
   { key: "transport", titleKey: "q2", options: ["À pied", "En vélo", "En voiture", "En transports"], dinouMsg: "Super ! On continue…" },
   { key: "travelTime", titleKey: "q3", options: ["5 minutes", "15 minutes", "30 minutes", "Peu importe"], dinouMsg: "Hum… je commence à avoir une idée… 🤔" },
   { key: "budget", titleKey: "q4", options: ["Menu à 20€ environ", "Menu entre 30€ et 50€", "Pas de limite, ce soir je me fais plaisir !"], dinouMsg: "Ça se précise…" },
-  { key: "food", titleKey: "q5", options: ["Viande", "Poisson", "Vegan", "Surprends-moi"], dinouMsg: "Miam miam 😋" },
+  { key: "food", titleKey: "q5", options: ["🍝 Italien", "🍣 Japonais", "🐟 Poisson", "🥩 Une bonne viande", "🥢 Asiatique", "🍽️ Brasserie", "✨ Bistronomie", "🥗 Végétarien / Vegan"], dinouMsg: "Miam miam 😋", isGrid: true },
   { key: "ambiance", titleKey: "q6", options: ["Cosy", "Branché", "Romantique", "Entre potes"], dinouMsg: "J'adore ton style !" },
   { key: "terrasse", titleKey: "q7", options: ["Oui", "Non", "Peu importe"], dinouMsg: "Bonne question…" },
   { key: "novelty", titleKey: "q8", options: ["Nouveau", "Classique"], dinouMsg: "Encore une question et je te trouve le restaurant parfait ! 🎯" },
@@ -175,6 +176,23 @@ const QuizPage = () => {
                     </label>
                   </div>
                 )}
+              </div>
+            ) : q.isGrid ? (
+              <div className="grid grid-cols-2 gap-3 max-w-sm mx-auto">
+                {q.options.map((option) => (
+                  <motion.button
+                    key={option}
+                    onClick={() => selectAnswer(option)}
+                    className={`px-3 py-3 rounded-xl text-center font-body text-sm transition-all ${
+                      answers[q.key] === option
+                        ? "bg-accent text-accent-foreground shadow-md"
+                        : "bg-card text-card-foreground border border-border hover:border-accent/50"
+                    }`}
+                    whileTap={{ scale: 0.97 }}
+                  >
+                    {option}
+                  </motion.button>
+                ))}
               </div>
             ) : (
               <div className="space-y-3 max-w-xs mx-auto">
