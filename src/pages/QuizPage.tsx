@@ -12,6 +12,7 @@ interface QuestionDef {
   options: string[];
   dinouMsg: string;
   isDropdown?: boolean;
+  isGrid?: boolean;
 }
 
 const questions: QuestionDef[] = [
