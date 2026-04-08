@@ -177,6 +177,23 @@ const QuizPage = () => {
                   </div>
                 )}
               </div>
+            ) : q.isGrid ? (
+              <div className="grid grid-cols-2 gap-3 max-w-sm mx-auto">
+                {q.options.map((option) => (
+                  <motion.button
+                    key={option}
+                    onClick={() => selectAnswer(option)}
+                    className={`px-3 py-3 rounded-xl text-center font-body text-sm transition-all ${
+                      answers[q.key] === option
+                        ? "bg-accent text-accent-foreground shadow-md"
+                        : "bg-card text-card-foreground border border-border hover:border-accent/50"
+                    }`}
+                    whileTap={{ scale: 0.97 }}
+                  >
+                    {option}
+                  </motion.button>
+                ))}
+              </div>
             ) : (
               <div className="space-y-3 max-w-xs mx-auto">
                 {q.options.map((option) => (
