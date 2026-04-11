@@ -1,11 +1,12 @@
 import { useNavigate } from "react-router-dom";
 import { ChevronLeft } from "lucide-react";
 import dinouLogo from "@/assets/dinou-logo.png";
+import defaultMenuPhoto from "@/assets/menu-placeholder.jpg";
 
 const MenuPage = () => {
   const navigate = useNavigate();
   const restaurantName = sessionStorage.getItem("menuRestaurantName") || "Restaurant";
-  const menuPhoto = sessionStorage.getItem("menuRestaurantPhoto") || "/placeholder.svg";
+  const menuPhoto = defaultMenuPhoto;
 
   return (
     <div className="flex flex-col min-h-screen bg-background px-6 py-6">
