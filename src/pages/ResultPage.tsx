@@ -56,6 +56,12 @@ const ResultPage = () => {
     window.open(`https://www.google.com/maps/search/?api=1&query=${query}`, "_blank");
   };
 
+  const handleViewMenu = () => {
+    sessionStorage.setItem("menuRestaurantName", restaurant.name);
+    sessionStorage.setItem("menuRestaurantPhoto", restaurant.photo);
+    navigate("/menu");
+  };
+
   return (
     <div className="flex flex-col min-h-screen bg-background px-6 py-6">
       <div className="flex flex-col items-center">
@@ -145,6 +151,12 @@ const ResultPage = () => {
           className="w-full py-3 rounded-full bg-accent text-accent-foreground font-heading font-semibold shadow-lg"
         >
           {t("reserve")}
+        </button>
+        <button
+          onClick={handleViewMenu}
+          className="w-full py-3 rounded-full bg-card text-card-foreground border border-border font-heading font-medium"
+        >
+          📋 Voir le menu
         </button>
         <button
           onClick={handleViewMap}

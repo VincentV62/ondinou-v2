@@ -8,6 +8,7 @@ import GeolocationPage from "./pages/GeolocationPage";
 import ReservationPage from "./pages/ReservationPage";
 import QuizPage from "./pages/QuizPage";
 import ResultPage from "./pages/ResultPage";
+import MenuPage from "./pages/MenuPage";
 import AuthPage from "./pages/AuthPage";
 import NotFound from "./pages/NotFound";
 import RestaurantDashboard from "./pages/RestaurantDashboard";
@@ -34,6 +35,7 @@ const AppShell = () => {
           <Route path="/reservation" element={<ReservationPage />} />
           <Route path="/quiz" element={<QuizPage />} />
           <Route path="/result" element={<ResultPage />} />
+          <Route path="/menu" element={<MenuPage />} />
           <Route path="/restaurant-signup" element={<RestaurantSignup />} />
           <Route path="/restaurant-dashboard" element={<RestaurantDashboard />} />
           <Route path="/restaurant-superfans" element={<RestaurantSuperfansPage />} />
