@@ -123,6 +123,55 @@ const QuizPage = () => {
     [step, answers, navigate, q.key]
   );
 
+  if (showGeoPrompt) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen bg-background px-6">
+        <motion.img
+          src={dinouLogo}
+          alt="Dinou"
+          className="w-28 h-28 object-contain animate-float"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+        />
+        <motion.div
+          className="mt-6 glass-card rounded-2xl p-6 max-w-sm text-center"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+        >
+          <MapPin className="w-8 h-8 text-accent mx-auto mb-4" />
+          <p className="text-foreground font-body text-base leading-relaxed">
+            Pour te trouver les meilleurs restos autour de toi, j'ai besoin de ta localisation 📍
+          </p>
+        </motion.div>
+        <div className="mt-8 flex gap-4">
+          <motion.button
+            onClick={handleGeoAllow}
+            className="px-6 py-3 rounded-full bg-accent text-accent-foreground font-heading font-semibold shadow-md"
+            whileTap={{ scale: 0.95 }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.6 }}
+          >
+            Autoriser
+          </motion.button>
+          <motion.button
+            onClick={handleGeoDeny}
+            className="px-6 py-3 rounded-full bg-muted text-muted-foreground font-heading font-semibold"
+            whileTap={{ scale: 0.95 }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.7 }}
+          >
+            Plus tard
+          </motion.button>
+        </div>
+      </div>
+    );
+  }
+
+  if (!geoResolved) return null;
+
   return (
     <div className="flex flex-col min-h-screen bg-background px-6 py-6 overflow-hidden">
       {/* Dinou avatar — large & prominent */}
