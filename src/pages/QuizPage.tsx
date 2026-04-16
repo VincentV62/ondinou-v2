@@ -1,7 +1,7 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, MapPin } from "lucide-react";
 import { t } from "@/data/i18n";
 import dinouLogo from "@/assets/dinou-logo.png";
 import type { QuizAnswers } from "@/data/restaurants";
@@ -47,6 +47,45 @@ const QuizPage = () => {
   const [dir, setDir] = useState(1);
   const savedAnswers = startStep > 0 ? JSON.parse(sessionStorage.getItem("quizAnswers") || "{}") : {};
   const [answers, setAnswers] = useState<Partial<QuizAnswers>>(savedAnswers);
+  const [showGeoPrompt, setShowGeoPrompt] = useState(false);
+  const [geoResolved, setGeoResolved] = useState(false);
+
+  useEffect(() => {
+    if (startStep > 0) {
+      setGeoResolved(true);
+      return;
+    }
+    // Check if geolocation was already granted this session
+    const geoGranted = sessionStorage.getItem("geoGranted");
+    if (geoGranted) {
+      setGeoResolved(true);
+      return;
+    }
+    setShowGeoPrompt(true);
+  }, [startStep]);
+
+  const handleGeoAllow = () => {
+    navigator.geolocation?.getCurrentPosition(
+      (pos) => {
+        sessionStorage.setItem("userLat", String(pos.coords.latitude));
+        sessionStorage.setItem("userLng", String(pos.coords.longitude));
+        sessionStorage.setItem("geoGranted", "true");
+        setShowGeoPrompt(false);
+        setGeoResolved(true);
+      },
+      () => {
+        sessionStorage.setItem("geoGranted", "denied");
+        setShowGeoPrompt(false);
+        setGeoResolved(true);
+      }
+    );
+  };
+
+  const handleGeoDeny = () => {
+    sessionStorage.setItem("geoGranted", "denied");
+    setShowGeoPrompt(false);
+    setGeoResolved(true);
+  };
 
   const q = questions[step];
   const progress = ((step + 1) / questions.length) * 100;
@@ -83,6 +122,55 @@ const QuizPage = () => {
     },
     [step, answers, navigate, q.key]
   );
+
+  if (showGeoPrompt) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen bg-background px-6">
+        <motion.img
+          src={dinouLogo}
+          alt="Dinou"
+          className="w-28 h-28 object-contain animate-float"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+        />
+        <motion.div
+          className="mt-6 glass-card rounded-2xl p-6 max-w-sm text-center"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+        >
+          <MapPin className="w-8 h-8 text-accent mx-auto mb-4" />
+          <p className="text-foreground font-body text-base leading-relaxed">
+            Pour te trouver les meilleurs restos autour de toi, j'ai besoin de ta localisation 📍
+          </p>
+        </motion.div>
+        <div className="mt-8 flex gap-4">
+          <motion.button
+            onClick={handleGeoAllow}
+            className="px-6 py-3 rounded-full bg-accent text-accent-foreground font-heading font-semibold shadow-md"
+            whileTap={{ scale: 0.95 }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.6 }}
+          >
+            Autoriser
+          </motion.button>
+          <motion.button
+            onClick={handleGeoDeny}
+            className="px-6 py-3 rounded-full bg-muted text-muted-foreground font-heading font-semibold"
+            whileTap={{ scale: 0.95 }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.7 }}
+          >
+            Plus tard
+          </motion.button>
+        </div>
+      </div>
+    );
+  }
+
+  if (!geoResolved) return null;
 
   return (
     <div className="flex flex-col min-h-screen bg-background px-6 py-6 overflow-hidden">
