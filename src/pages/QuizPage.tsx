@@ -47,6 +47,45 @@ const QuizPage = () => {
   const [dir, setDir] = useState(1);
   const savedAnswers = startStep > 0 ? JSON.parse(sessionStorage.getItem("quizAnswers") || "{}") : {};
   const [answers, setAnswers] = useState<Partial<QuizAnswers>>(savedAnswers);
+  const [showGeoPrompt, setShowGeoPrompt] = useState(false);
+  const [geoResolved, setGeoResolved] = useState(false);
+
+  useEffect(() => {
+    if (startStep > 0) {
+      setGeoResolved(true);
+      return;
+    }
+    // Check if geolocation was already granted this session
+    const geoGranted = sessionStorage.getItem("geoGranted");
+    if (geoGranted) {
+      setGeoResolved(true);
+      return;
+    }
+    setShowGeoPrompt(true);
+  }, [startStep]);
+
+  const handleGeoAllow = () => {
+    navigator.geolocation?.getCurrentPosition(
+      (pos) => {
+        sessionStorage.setItem("userLat", String(pos.coords.latitude));
+        sessionStorage.setItem("userLng", String(pos.coords.longitude));
+        sessionStorage.setItem("geoGranted", "true");
+        setShowGeoPrompt(false);
+        setGeoResolved(true);
+      },
+      () => {
+        sessionStorage.setItem("geoGranted", "denied");
+        setShowGeoPrompt(false);
+        setGeoResolved(true);
+      }
+    );
+  };
+
+  const handleGeoDeny = () => {
+    sessionStorage.setItem("geoGranted", "denied");
+    setShowGeoPrompt(false);
+    setGeoResolved(true);
+  };
 
   const q = questions[step];
   const progress = ((step + 1) / questions.length) * 100;
