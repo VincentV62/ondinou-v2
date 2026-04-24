@@ -137,14 +137,55 @@ export default function RestaurantDashboard() {
 
   useEffect(() => {
     async function load() {
+      const demoMode = sessionStorage.getItem("demo_restaurant") === "table-de-vincent";
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) { navigate("/auth"); return; }
+
+      if (!user && !demoMode) { navigate("/auth"); return; }
+
+      // Demo bypass: load "Table de Vincent" by name
+      if (demoMode) {
+        const { data: demoResto } = await supabase
+          .from("restaurants")
+          .select("id, name")
+          .ilike("name", "%vincent%")
+          .limit(1)
+          .maybeSingle();
+
+        if (demoResto) {
+          setRestaurantName(demoResto.name);
+          const { data: resData } = await supabase
+            .from("reservations")
+            .select("*")
+            .eq("restaurant_id", demoResto.id)
+            .order("date", { ascending: false })
+            .limit(100);
+          if (resData) {
+            const userIds = [...new Set(resData.map(r => r.user_id))];
+            const resIds = resData.map(r => r.id);
+            const [profilesRes, reviewsRes] = await Promise.all([
+              supabase.from("profiles").select("user_id, first_name, last_name").in("user_id", userIds.length ? userIds : ["none"]),
+              supabase.from("reviews").select("reservation_id, rating, text").in("reservation_id", resIds.length ? resIds : ["none"]),
+            ]);
+            const profileMap = new Map((profilesRes.data || []).map(p => [p.user_id, p]));
+            const reviewMap = new Map((reviewsRes.data || []).map(r => [r.reservation_id, r]));
+            setReservations(resData.map(r => ({
+              ...r,
+              profile: profileMap.get(r.user_id) || null,
+              review: reviewMap.get(r.id) || null,
+            })));
+          }
+        } else {
+          setRestaurantName("Table de Vincent (démo)");
+        }
+        setLoading(false);
+        return;
+      }
 
       // Get owner's restaurant
       const { data: restaurants } = await supabase
         .from("restaurants")
         .select("id, name")
-        .eq("owner_id", user.id)
+        .eq("owner_id", user!.id)
         .limit(1);
 
       if (!restaurants?.length) {

@@ -187,6 +187,21 @@ const RestaurantSignup = () => {
           >
             {mode === "login" ? "Pas encore de compte ? Inscris-toi" : "Déjà un compte ? Connecte-toi"}
           </button>
+
+          <div className="pt-3 mt-3 border-t border-border">
+            <button
+              onClick={() => {
+                sessionStorage.setItem("demo_restaurant", "table-de-vincent");
+                navigate("/restaurant-dashboard");
+              }}
+              className="w-full py-3 rounded-full bg-accent/20 text-foreground border border-accent font-body text-sm hover:bg-accent/30 transition-colors"
+            >
+              🧪 Accès démo : Table de Vincent
+            </button>
+            <p className="mt-2 text-[11px] text-muted-foreground font-body text-center">
+              Accès direct au tableau de bord sans identification
+            </p>
+          </div>
         </motion.div>
       )}
 
