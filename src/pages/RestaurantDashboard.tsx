@@ -45,6 +45,25 @@ const EMOJI_MAP: Record<number, string> = {
 
 const MONTH_NAMES = ["Jan", "Fév", "Mar", "Avr", "Mai", "Juin", "Juil", "Aoû", "Sep", "Oct", "Nov", "Déc"];
 
+const DEMO_NAMES = [
+  { first_name: "Marie", last_name: "Dupont" },
+  { first_name: "Thomas", last_name: "Lefebvre" },
+  { first_name: "Camille", last_name: "Bernard" },
+  { first_name: "Julien", last_name: "Moreau" },
+  { first_name: "Sophie", last_name: "Durand" },
+  { first_name: "Lucas", last_name: "Petit" },
+  { first_name: "Léa", last_name: "Robert" },
+  { first_name: "Hugo", last_name: "Richard" },
+  { first_name: "Chloé", last_name: "Simon" },
+  { first_name: "Antoine", last_name: "Laurent" },
+];
+
+const DEMO_VISITORS_BY_MONTH: Record<number, number> = {
+  0: 248,
+  1: 316,
+  2: 402,
+};
+
 function buildMonthlyData(reservations: ReservationRow[]) {
   const counts = new Array(12).fill(0);
   reservations.forEach((r) => {
@@ -52,6 +71,10 @@ function buildMonthlyData(reservations: ReservationRow[]) {
     counts[m]++;
   });
   return MONTH_NAMES.map((month, i) => ({ label: month, reservations: counts[i], monthIndex: i }));
+}
+
+function buildMonthlyVisitorsData(visitorCounts: Record<number, number>) {
+  return MONTH_NAMES.map((month, i) => ({ label: month, visitors: visitorCounts[i] || 0, monthIndex: i }));
 }
 
 function getWeeksOfMonth(reservations: ReservationRow[], monthIndex: number) {
