@@ -45,6 +45,25 @@ const EMOJI_MAP: Record<number, string> = {
 
 const MONTH_NAMES = ["Jan", "Fév", "Mar", "Avr", "Mai", "Juin", "Juil", "Aoû", "Sep", "Oct", "Nov", "Déc"];
 
+const DEMO_NAMES = [
+  { first_name: "Marie", last_name: "Dupont" },
+  { first_name: "Thomas", last_name: "Lefebvre" },
+  { first_name: "Camille", last_name: "Bernard" },
+  { first_name: "Julien", last_name: "Moreau" },
+  { first_name: "Sophie", last_name: "Durand" },
+  { first_name: "Lucas", last_name: "Petit" },
+  { first_name: "Léa", last_name: "Robert" },
+  { first_name: "Hugo", last_name: "Richard" },
+  { first_name: "Chloé", last_name: "Simon" },
+  { first_name: "Antoine", last_name: "Laurent" },
+];
+
+const DEMO_VISITORS_BY_MONTH: Record<number, number> = {
+  0: 248,
+  1: 316,
+  2: 402,
+};
+
 function buildMonthlyData(reservations: ReservationRow[]) {
   const counts = new Array(12).fill(0);
   reservations.forEach((r) => {
@@ -52,6 +71,10 @@ function buildMonthlyData(reservations: ReservationRow[]) {
     counts[m]++;
   });
   return MONTH_NAMES.map((month, i) => ({ label: month, reservations: counts[i], monthIndex: i }));
+}
+
+function buildMonthlyVisitorsData(visitorCounts: Record<number, number>) {
+  return MONTH_NAMES.map((month, i) => ({ label: month, visitors: visitorCounts[i] || 0, monthIndex: i }));
 }
 
 function getWeeksOfMonth(reservations: ReservationRow[], monthIndex: number) {
@@ -120,6 +143,10 @@ const chartConfig = {
     label: "Réservations",
     color: "hsl(var(--accent))",
   },
+  visitors: {
+    label: "Visiteurs",
+    color: "hsl(var(--primary))",
+  },
 };
 
 export default function RestaurantDashboard() {
@@ -127,6 +154,7 @@ export default function RestaurantDashboard() {
   const [reservations, setReservations] = useState<ReservationRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [restaurantName, setRestaurantName] = useState("Mon restaurant");
+  const [visitorCounts, setVisitorCounts] = useState<Record<number, number>>({});
 
   const handleClientNoteChange = async (reservationId: string, value: string) => {
     await supabase.from("reservations").update({ client_note: value } as any).eq("id", reservationId);
@@ -168,9 +196,10 @@ export default function RestaurantDashboard() {
             ]);
             const profileMap = new Map((profilesRes.data || []).map(p => [p.user_id, p]));
             const reviewMap = new Map((reviewsRes.data || []).map(r => [r.reservation_id, r]));
-            setReservations(resData.map(r => ({
+            setVisitorCounts(DEMO_VISITORS_BY_MONTH);
+            setReservations(resData.map((r, i) => ({
               ...r,
-              profile: profileMap.get(r.user_id) || null,
+              profile: DEMO_NAMES[i % DEMO_NAMES.length] || profileMap.get(r.user_id) || null,
               review: reviewMap.get(r.id) || null,
             })));
           }
@@ -272,12 +301,14 @@ export default function RestaurantDashboard() {
     : "—";
 
   const superfans = reservations.filter(r => r.review && r.review.rating >= 4).length;
+  const visitorTotal = Object.values(visitorCounts).reduce((sum, count) => sum + count, 0);
 
   // Chart drill-down state: null = monthly, number = month selected, [month, week] = week selected
   const [selectedMonth, setSelectedMonth] = useState<number | null>(null);
   const [selectedWeek, setSelectedWeek] = useState<string | null>(null);
 
   const monthlyData = useMemo(() => buildMonthlyData(reservations), [reservations]);
+  const monthlyVisitorsData = useMemo(() => buildMonthlyVisitorsData(visitorCounts), [visitorCounts]);
 
   const chartData = useMemo(() => {
     if (selectedMonth !== null && selectedWeek !== null) {
@@ -328,8 +359,9 @@ export default function RestaurantDashboard() {
           animate={{ opacity: 1, y: 0 }}
           className="grid grid-cols-2 md:grid-cols-4 gap-3"
         >
-          {[
-            { label: "Clients envoyés ce mois", value: reservations.length, icon: Users, color: "text-secondary" },
+            {[
+              { label: "Clients envoyés", value: reservations.length, icon: Users, color: "text-secondary" },
+              { label: "Visiteurs simulés", value: visitorTotal || "—", icon: Users, color: "text-primary" },
             { label: "Réservations ONDINOU", value: reservations.length, icon: CalendarCheck, color: "text-accent" },
             { label: "Note moyenne Dinou", value: avgRating, icon: Star, color: "text-accent" },
             { label: "Superfans", value: superfans, icon: Heart, color: "text-destructive", onClick: () => navigate("/restaurant-superfans") },
@@ -357,6 +389,27 @@ export default function RestaurantDashboard() {
         </motion.div>
 
         {/* Chart with drill-down */}
+        {visitorTotal > 0 && (
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }}>
+            <Card className="glass-card">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-base font-heading">Visiteurs simulés par mois</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <ChartContainer config={chartConfig} className="h-[180px] w-full">
+                  <BarChart data={monthlyVisitorsData}>
+                    <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
+                    <XAxis dataKey="label" className="text-xs" />
+                    <YAxis allowDecimals={false} className="text-xs" />
+                    <ChartTooltip content={<ChartTooltipContent />} />
+                    <Bar dataKey="visitors" fill="hsl(var(--primary))" radius={[6, 6, 0, 0]} />
+                  </BarChart>
+                </ChartContainer>
+              </CardContent>
+            </Card>
+          </motion.div>
+        )}
+
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
           <Card className="glass-card">
             <CardHeader className="pb-2 flex flex-row items-center gap-2">
