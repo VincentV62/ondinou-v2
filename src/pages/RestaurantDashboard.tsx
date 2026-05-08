@@ -143,6 +143,10 @@ const chartConfig = {
     label: "Réservations",
     color: "hsl(var(--accent))",
   },
+  visitors: {
+    label: "Visiteurs",
+    color: "hsl(var(--primary))",
+  },
 };
 
 export default function RestaurantDashboard() {
@@ -150,6 +154,7 @@ export default function RestaurantDashboard() {
   const [reservations, setReservations] = useState<ReservationRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [restaurantName, setRestaurantName] = useState("Mon restaurant");
+  const [visitorCounts, setVisitorCounts] = useState<Record<number, number>>({});
 
   const handleClientNoteChange = async (reservationId: string, value: string) => {
     await supabase.from("reservations").update({ client_note: value } as any).eq("id", reservationId);
@@ -191,9 +196,10 @@ export default function RestaurantDashboard() {
             ]);
             const profileMap = new Map((profilesRes.data || []).map(p => [p.user_id, p]));
             const reviewMap = new Map((reviewsRes.data || []).map(r => [r.reservation_id, r]));
-            setReservations(resData.map(r => ({
+            setVisitorCounts(DEMO_VISITORS_BY_MONTH);
+            setReservations(resData.map((r, i) => ({
               ...r,
-              profile: profileMap.get(r.user_id) || null,
+              profile: DEMO_NAMES[i % DEMO_NAMES.length] || profileMap.get(r.user_id) || null,
               review: reviewMap.get(r.id) || null,
             })));
           }
@@ -295,12 +301,14 @@ export default function RestaurantDashboard() {
     : "—";
 
   const superfans = reservations.filter(r => r.review && r.review.rating >= 4).length;
+  const visitorTotal = Object.values(visitorCounts).reduce((sum, count) => sum + count, 0);
 
   // Chart drill-down state: null = monthly, number = month selected, [month, week] = week selected
   const [selectedMonth, setSelectedMonth] = useState<number | null>(null);
   const [selectedWeek, setSelectedWeek] = useState<string | null>(null);
 
   const monthlyData = useMemo(() => buildMonthlyData(reservations), [reservations]);
+  const monthlyVisitorsData = useMemo(() => buildMonthlyVisitorsData(visitorCounts), [visitorCounts]);
 
   const chartData = useMemo(() => {
     if (selectedMonth !== null && selectedWeek !== null) {
@@ -351,8 +359,9 @@ export default function RestaurantDashboard() {
           animate={{ opacity: 1, y: 0 }}
           className="grid grid-cols-2 md:grid-cols-4 gap-3"
         >
-          {[
-            { label: "Clients envoyés ce mois", value: reservations.length, icon: Users, color: "text-secondary" },
+            {[
+              { label: "Clients envoyés", value: reservations.length, icon: Users, color: "text-secondary" },
+              { label: "Visiteurs simulés", value: visitorTotal || "—", icon: Users, color: "text-primary" },
             { label: "Réservations ONDINOU", value: reservations.length, icon: CalendarCheck, color: "text-accent" },
             { label: "Note moyenne Dinou", value: avgRating, icon: Star, color: "text-accent" },
             { label: "Superfans", value: superfans, icon: Heart, color: "text-destructive", onClick: () => navigate("/restaurant-superfans") },
