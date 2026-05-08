@@ -389,6 +389,27 @@ export default function RestaurantDashboard() {
         </motion.div>
 
         {/* Chart with drill-down */}
+        {visitorTotal > 0 && (
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }}>
+            <Card className="glass-card">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-base font-heading">Visiteurs simulés par mois</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <ChartContainer config={chartConfig} className="h-[180px] w-full">
+                  <BarChart data={monthlyVisitorsData}>
+                    <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
+                    <XAxis dataKey="label" className="text-xs" />
+                    <YAxis allowDecimals={false} className="text-xs" />
+                    <ChartTooltip content={<ChartTooltipContent />} />
+                    <Bar dataKey="visitors" fill="hsl(var(--primary))" radius={[6, 6, 0, 0]} />
+                  </BarChart>
+                </ChartContainer>
+              </CardContent>
+            </Card>
+          </motion.div>
+        )}
+
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
           <Card className="glass-card">
             <CardHeader className="pb-2 flex flex-row items-center gap-2">
