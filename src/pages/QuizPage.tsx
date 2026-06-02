@@ -110,6 +110,8 @@ const QuizPage = () => {
       const updated = { ...answers, [q.key]: value };
       setAnswers(updated);
 
+      if (q.key === "guests") return;
+
       setTimeout(() => {
         if (step < questions.length - 1) {
           setDir(1);
@@ -122,6 +124,12 @@ const QuizPage = () => {
     },
     [step, answers, navigate, q.key]
   );
+
+  const confirmGuests = useCallback(() => {
+    sessionStorage.setItem("quizAnswers", JSON.stringify(answers));
+    setDir(1);
+    setStep(step + 1);
+  }, [step, answers]);
 
   if (showGeoPrompt) {
     return (
