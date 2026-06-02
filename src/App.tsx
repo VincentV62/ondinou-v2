@@ -41,6 +41,7 @@ const AppShell = () => {
           <Route path="/restaurant-dashboard" element={<RestaurantDashboard />} />
           <Route path="/restaurant-superfans" element={<RestaurantSuperfansPage />} />
           <Route path="/points" element={<PointsPage />} />
+          <Route path="/creator" element={<CreatorPage />} />
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
