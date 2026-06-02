@@ -201,6 +201,13 @@ const AuthPage = () => {
       >
         Je suis restaurateur
       </button>
+
+      <button
+        onClick={() => navigate("/creator")}
+        className="mt-3 text-[10px] text-muted-foreground/50 font-body hover:text-muted-foreground transition-colors"
+      >
+        page créateur
+      </button>
     </div>
   );
 };

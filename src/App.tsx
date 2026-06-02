@@ -16,6 +16,7 @@ import RestaurantSignup from "./pages/RestaurantSignup";
 import RestaurantSuperfansPage from "./pages/RestaurantSuperfansPage";
 import ProfilePage from "./pages/ProfilePage";
 import PointsPage from "./pages/PointsPage";
+import CreatorPage from "./pages/CreatorPage";
 import BottomNav from "./components/BottomNav";
 
 const queryClient = new QueryClient();
@@ -40,6 +41,7 @@ const AppShell = () => {
           <Route path="/restaurant-dashboard" element={<RestaurantDashboard />} />
           <Route path="/restaurant-superfans" element={<RestaurantSuperfansPage />} />
           <Route path="/points" element={<PointsPage />} />
+          <Route path="/creator" element={<CreatorPage />} />
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
