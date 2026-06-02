@@ -110,6 +110,8 @@ const QuizPage = () => {
       const updated = { ...answers, [q.key]: value };
       setAnswers(updated);
 
+      if (q.key === "guests") return;
+
       setTimeout(() => {
         if (step < questions.length - 1) {
           setDir(1);
@@ -122,6 +124,12 @@ const QuizPage = () => {
     },
     [step, answers, navigate, q.key]
   );
+
+  const confirmGuests = useCallback(() => {
+    sessionStorage.setItem("quizAnswers", JSON.stringify(answers));
+    setDir(1);
+    setStep(step + 1);
+  }, [step, answers]);
 
   if (showGeoPrompt) {
     return (
@@ -263,6 +271,17 @@ const QuizPage = () => {
                       <input type="checkbox" className="h-5 w-5 rounded border-border accent-[hsl(var(--accent))] cursor-pointer" />
                     </label>
                   </div>
+                )}
+                {q.key === "guests" && answers.guests !== undefined && (
+                  <motion.button
+                    onClick={confirmGuests}
+                    className="w-full py-3 rounded-full bg-accent text-accent-foreground font-heading font-semibold text-lg shadow-lg mt-4"
+                    whileTap={{ scale: 0.97 }}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                  >
+                    Continuer
+                  </motion.button>
                 )}
               </div>
             ) : q.isGrid ? (

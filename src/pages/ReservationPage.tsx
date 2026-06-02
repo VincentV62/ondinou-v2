@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { t } from "@/data/i18n";
@@ -17,6 +17,15 @@ const ReservationPage = () => {
   const navigate = useNavigate();
   const [dateOption, setDateOption] = useState<string>("");
   const [time, setTime] = useState<string>("");
+
+  useEffect(() => {
+    if (dateOption && time) {
+      const timer = setTimeout(() => {
+        navigate("/quiz");
+      }, 400);
+      return () => clearTimeout(timer);
+    }
+  }, [dateOption, time, navigate]);
 
   const today = new Date();
   const dateOptions = [
