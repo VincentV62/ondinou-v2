@@ -272,6 +272,17 @@ const QuizPage = () => {
                     </label>
                   </div>
                 )}
+                {q.key === "guests" && answers.guests !== undefined && (
+                  <motion.button
+                    onClick={confirmGuests}
+                    className="w-full py-3 rounded-full bg-accent text-accent-foreground font-heading font-semibold text-lg shadow-lg mt-4"
+                    whileTap={{ scale: 0.97 }}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                  >
+                    Continuer
+                  </motion.button>
+                )}
               </div>
             ) : q.isGrid ? (
               <div className="grid grid-cols-2 gap-3 max-w-sm mx-auto">
