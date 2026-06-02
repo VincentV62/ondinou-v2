@@ -18,6 +18,15 @@ const ReservationPage = () => {
   const [dateOption, setDateOption] = useState<string>("");
   const [time, setTime] = useState<string>("");
 
+  useEffect(() => {
+    if (dateOption && time) {
+      const timer = setTimeout(() => {
+        navigate("/quiz");
+      }, 400);
+      return () => clearTimeout(timer);
+    }
+  }, [dateOption, time, navigate]);
+
   const today = new Date();
   const dateOptions = [
     { label: t("today"), value: format(today, "EEEE d MMMM", { locale: fr }) },
