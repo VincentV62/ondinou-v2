@@ -16,6 +16,7 @@ import RestaurantSignup from "./pages/RestaurantSignup";
 import RestaurantSuperfansPage from "./pages/RestaurantSuperfansPage";
 import ProfilePage from "./pages/ProfilePage";
 import PointsPage from "./pages/PointsPage";
+import CreatorPage from "./pages/CreatorPage";
 import BottomNav from "./components/BottomNav";
 
 const queryClient = new QueryClient();
