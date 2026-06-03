@@ -18,6 +18,7 @@ import ProfilePage from "./pages/ProfilePage";
 import PointsPage from "./pages/PointsPage";
 import CreatorPage from "./pages/CreatorPage";
 import BottomNav from "./components/BottomNav";
+import TopControls from "./components/TopControls";
 
 const queryClient = new QueryClient();
 
@@ -47,6 +48,7 @@ const AppShell = () => {
         </Routes>
       </div>
       <BottomNav />
+      <TopControls />
     </div>
   );
 };
