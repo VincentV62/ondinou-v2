@@ -52,13 +52,23 @@ const translations: Record<string, Record<string, string>> = {
 };
 
 let currentLang = "fr";
-const browserLang = navigator.language.slice(0, 2);
-if (["fr", "en"].includes(browserLang)) currentLang = browserLang;
+const stored = typeof localStorage !== "undefined" ? localStorage.getItem("lang") : null;
+if (stored && ["fr", "en"].includes(stored)) {
+  currentLang = stored;
+} else {
+  const browserLang = navigator.language.slice(0, 2);
+  if (["fr", "en"].includes(browserLang)) currentLang = browserLang;
+}
 
 export function t(key: string): string {
   return translations[currentLang]?.[key] || translations.fr[key] || key;
 }
 
+export function getLang(): string {
+  return currentLang;
+}
+
 export function setLang(lang: string) {
   currentLang = lang;
+  if (typeof localStorage !== "undefined") localStorage.setItem("lang", lang);
 }
