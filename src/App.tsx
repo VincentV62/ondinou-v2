@@ -48,6 +48,7 @@ const AppShell = () => {
         </Routes>
       </div>
       <BottomNav />
+      <TopControls />
     </div>
   );
 };
