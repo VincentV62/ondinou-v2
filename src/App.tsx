@@ -19,6 +19,7 @@ import PointsPage from "./pages/PointsPage";
 import CreatorPage from "./pages/CreatorPage";
 import BottomNav from "./components/BottomNav";
 import TopControls from "./components/TopControls";
+import AutoTranslate from "./components/AutoTranslate";
 
 const queryClient = new QueryClient();
 
@@ -49,6 +50,7 @@ const AppShell = () => {
       </div>
       <BottomNav />
       <TopControls />
+      <AutoTranslate />
     </div>
   );
 };
