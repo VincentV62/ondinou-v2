@@ -228,8 +228,11 @@ const ProfilePage = () => {
                 key={i}
                 className="rounded-xl border-2 border-primary/20 p-3 bg-card"
               >
-                <div className="flex justify-between items-center mb-1">
-                  <span className="font-semibold">{h.name}</span>
+              <div className="flex justify-between items-center mb-1">
+                  <div>
+                    <span className="font-semibold">{h.name}</span>
+                    <span className="text-xs text-muted-foreground ml-2">{h.date}</span>
+                  </div>
                   <div className="flex">
                     {Array.from({ length: 5 }).map((_, idx) => (
                       <Star
