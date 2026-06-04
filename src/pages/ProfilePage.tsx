@@ -1,20 +1,103 @@
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import dinouLogo from "@/assets/dinou-logo.png";
 import { badges } from "@/data/gamification";
+import { restaurants } from "@/data/restaurants";
 import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { ChevronDown, Star } from "lucide-react";
+
+const ALLERGIES = [
+  "Gluten",
+  "Arachides",
+  "Fruits à coque",
+  "Lait (lactose)",
+  "Œufs",
+  "Poisson",
+  "Crustacés",
+  "Mollusques",
+  "Soja",
+  "Céleri",
+  "Moutarde",
+  "Sésame",
+  "Sulfites",
+  "Lupin",
+];
+
+interface HistoryItem {
+  restaurantId: string;
+  name: string;
+  date: string;
+  rating?: number;
+  review?: string;
+}
+
+const STORAGE_KEY = "ondinou_profile_v1";
+
+const loadProfile = () => {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) return JSON.parse(raw);
+  } catch {}
+  return null;
+};
 
 const ProfilePage = () => {
   const navigate = useNavigate();
 
-  const user = {
-    name: "Vincent",
-    dinous: 320,
-    friends: 8,
-    rank: 2,
+  const user = { name: "Vincent", dinous: 320, friends: 8, rank: 2 };
+
+  const stored = loadProfile();
+  const [allergies, setAllergies] = useState<string[]>(stored?.allergies ?? []);
+  const [likes, setLikes] = useState<string>(stored?.likes ?? "");
+  const [dislikes, setDislikes] = useState<string>(stored?.dislikes ?? "");
+
+  // Mock history seeded from existing restaurants
+  const history: HistoryItem[] = stored?.history ?? [
+    {
+      restaurantId: restaurants[0]?.id ?? "1",
+      name: restaurants[0]?.name ?? "Rouge Barre",
+      date: "12 mai 2026",
+      rating: 5,
+      review: "Service impeccable, plats créatifs. À refaire !",
+    },
+    {
+      restaurantId: restaurants[1]?.id ?? "2",
+      name: restaurants[1]?.name ?? "Le Bistrot",
+      date: "28 avril 2026",
+      rating: 4,
+      review: "Bonne ambiance, un peu bruyant.",
+    },
+    {
+      restaurantId: restaurants[2]?.id ?? "3",
+      name: restaurants[2]?.name ?? "Chez Marie",
+      date: "10 avril 2026",
+      rating: 3,
+      review: "Correct sans plus.",
+    },
+  ];
+
+  useEffect(() => {
+    localStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify({ allergies, likes, dislikes, history }),
+    );
+  }, [allergies, likes, dislikes]);
+
+  const toggleAllergy = (a: string) => {
+    setAllergies((prev) =>
+      prev.includes(a) ? prev.filter((x) => x !== a) : [...prev, a],
+    );
   };
 
   return (
-    <main className="flex flex-col items-center h-full bg-background text-foreground px-4 py-6 overflow-y-auto">
+    <main className="flex flex-col items-center h-full bg-background text-foreground px-4 py-6 overflow-y-auto pb-24">
       {/* Profil */}
       <div className="flex flex-col items-center mt-4">
         <div className="w-20 h-20 rounded-full bg-secondary flex items-center justify-center text-3xl font-bold text-primary">
@@ -49,6 +132,124 @@ const ProfilePage = () => {
               {b.name}
             </span>
           ))}
+        </div>
+      </div>
+
+      {/* Allergies */}
+      <div className="w-full mt-8">
+        <h3 className="font-semibold mb-2">Mes allergies 🚫</h3>
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button
+              variant="outline"
+              className="w-full justify-between rounded-xl border-primary text-left"
+            >
+              <span className="truncate">
+                {allergies.length === 0
+                  ? "Sélectionner mes allergies"
+                  : allergies.join(", ")}
+              </span>
+              <ChevronDown className="h-4 w-4 opacity-60" />
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-[280px] p-2 max-h-72 overflow-y-auto">
+            {ALLERGIES.map((a) => (
+              <label
+                key={a}
+                className="flex items-center gap-2 px-2 py-1.5 rounded hover:bg-accent cursor-pointer"
+              >
+                <Checkbox
+                  checked={allergies.includes(a)}
+                  onCheckedChange={() => toggleAllergy(a)}
+                />
+                <span className="text-sm">{a}</span>
+              </label>
+            ))}
+          </PopoverContent>
+        </Popover>
+      </div>
+
+      {/* Préférences texte */}
+      <div className="w-full mt-8 space-y-4">
+        <div>
+          <h3 className="font-semibold mb-2">Ce que j'aime au restaurant ❤️</h3>
+          <Textarea
+            value={likes}
+            maxLength={180}
+            onChange={(e) => setLikes(e.target.value)}
+            placeholder="Ambiance cosy, plats végétariens, bons vins..."
+            className="rounded-xl"
+          />
+          <p className="text-xs text-muted-foreground text-right mt-1">
+            {likes.length}/180
+          </p>
+        </div>
+        <div>
+          <h3 className="font-semibold mb-2">Ce que je n'aime pas 🚷</h3>
+          <Textarea
+            value={dislikes}
+            maxLength={180}
+            onChange={(e) => setDislikes(e.target.value)}
+            placeholder="Trop bruyant, service lent, plats trop épicés..."
+            className="rounded-xl"
+          />
+          <p className="text-xs text-muted-foreground text-right mt-1">
+            {dislikes.length}/180
+          </p>
+        </div>
+      </div>
+
+      {/* Historique des réservations */}
+      <div className="w-full mt-8">
+        <h3 className="font-semibold mb-3">Mes réservations 📅</h3>
+        <div className="space-y-2">
+          {history.map((h, i) => (
+            <div
+              key={i}
+              className="rounded-xl border-2 border-primary/20 p-3 bg-card"
+            >
+              <div className="flex justify-between items-center">
+                <span className="font-semibold">{h.name}</span>
+                <span className="text-xs text-muted-foreground">{h.date}</span>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Notes & avis */}
+      <div className="w-full mt-8">
+        <h3 className="font-semibold mb-3">Mes notes & avis ⭐</h3>
+        <div className="space-y-2">
+          {history
+            .filter((h) => h.rating)
+            .map((h, i) => (
+              <div
+                key={i}
+                className="rounded-xl border-2 border-primary/20 p-3 bg-card"
+              >
+                <div className="flex justify-between items-center mb-1">
+                  <span className="font-semibold">{h.name}</span>
+                  <div className="flex">
+                    {Array.from({ length: 5 }).map((_, idx) => (
+                      <Star
+                        key={idx}
+                        className={`h-4 w-4 ${
+                          idx < (h.rating ?? 0)
+                            ? "fill-yellow-400 text-yellow-400"
+                            : "text-muted-foreground/30"
+                        }`}
+                      />
+                    ))}
+                  </div>
+                </div>
+                {h.review && (
+                  <p className="text-sm text-muted-foreground italic">
+                    « {h.review} »
+                  </p>
+                )}
+              </div>
+            ))}
         </div>
       </div>
 
