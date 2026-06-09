@@ -78,6 +78,25 @@ const CreatorPage = () => {
     setArr(arr.includes(val) ? arr.filter((x) => x !== val) : [...arr, val]);
   };
 
+  const handleDelete = async (id: string, isLocal: boolean) => {
+    const confirmed = window.confirm("Supprimer définitivement ce restaurant ?");
+    if (!confirmed) return;
+
+    if (isLocal) {
+      setHiddenLocalIds((prev) => new Set(prev).add(id));
+      toast.success("Restaurant retiré de la liste");
+      return;
+    }
+
+    const { error } = await supabase.from("restaurants").delete().eq("id", id);
+    if (error) {
+      toast.error("Erreur lors de la suppression : " + error.message);
+      return;
+    }
+    setDbRestaurants((prev) => prev.filter((r) => r.id !== id));
+    toast.success("Restaurant supprimé");
+  };
+
   const handleSubmit = async () => {
     if (!name.trim() || !description.trim() || !address.trim()) {
       toast.error("Nom, description et adresse sont obligatoires");
