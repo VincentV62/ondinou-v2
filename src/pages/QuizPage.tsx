@@ -30,7 +30,7 @@ const questions: QuestionDef[] = [
 const budgetMap: Record<string, number> = {
   "Menu à 20€ environ": 1,
   "Menu entre 30€ et 50€": 2,
-  "Pas de limite, ce soir je me fais plaisir !": 3,
+  "Pas de limite, je me fais plaisir !": 3,
 };
 
 const slideVariants = {
