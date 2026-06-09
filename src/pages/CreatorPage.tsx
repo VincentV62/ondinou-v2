@@ -374,10 +374,11 @@ const Tag = ({ children }: { children: React.ReactNode }) => (
 );
 
 const RestoCard = ({
-  name, cuisine, rating, priceRange, foodType, ambiance, terrasse, isNew, availableTables,
+  name, cuisine, rating, priceRange, foodType, ambiance, terrasse, isNew, availableTables, onDelete,
 }: {
   name: string; cuisine: string; rating: number; priceRange: string;
   foodType: string[]; ambiance: string[]; terrasse: boolean; isNew: boolean; availableTables: number;
+  onDelete?: () => void;
 }) => (
   <div className="p-4 rounded-xl border border-border bg-card space-y-2">
     <div className="flex items-start justify-between gap-2">
@@ -387,8 +388,17 @@ const RestoCard = ({
           <Utensils className="w-3 h-3" /> {cuisine}
         </div>
       </div>
-      <div className="flex items-center gap-1 text-sm font-body">
+      <div className="flex items-center gap-2 text-sm font-body">
         <Star className="w-3.5 h-3.5 fill-accent text-accent" /> {rating.toFixed(1)}
+        {onDelete && (
+          <button
+            onClick={onDelete}
+            className="ml-1 p-1 rounded-md hover:bg-destructive/10 text-muted-foreground hover:text-destructive transition-colors"
+            title="Supprimer"
+          >
+            <Trash2 className="w-4 h-4" />
+          </button>
+        )}
       </div>
     </div>
 
