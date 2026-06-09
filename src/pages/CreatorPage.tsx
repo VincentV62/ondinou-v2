@@ -60,6 +60,7 @@ const CreatorPage = () => {
   // List tab
   const [dbRestaurants, setDbRestaurants] = useState<RestoRow[]>([]);
   const [tab, setTab] = useState("create");
+  const [hiddenLocalIds, setHiddenLocalIds] = useState<Set<string>>(new Set());
 
   const loadRestaurants = async () => {
     const { data } = await supabase
