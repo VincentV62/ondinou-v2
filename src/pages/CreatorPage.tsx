@@ -132,6 +132,8 @@ const CreatorPage = () => {
     localStorage.setItem("fakeWeeklyUses", JSON.stringify(uses));
 
     toast.success(`✓ "${name}" ajouté à la base !`);
+    setTab("list");
+    loadRestaurants();
     setLoading(false);
     setName("");
     setDescription("");
