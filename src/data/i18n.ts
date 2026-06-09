@@ -35,7 +35,7 @@ const translations: Record<string, Record<string, string>> = {
     q1: "How many guests?",
     q2: "How are you getting there?",
     q3: "Stay nearby or go further?",
-    q4: "What's your budget tonight?",
+    q4: "What's your budget?",
     q5: "What are you in the mood for?",
     q6: "What vibe?",
     q7: "Outdoor seating?",
