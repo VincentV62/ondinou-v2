@@ -294,22 +294,26 @@ const CreatorPage = () => {
 
               <div className="space-y-3">
                 <h3 className="font-heading text-sm font-semibold text-muted-foreground uppercase tracking-wide">
-                  Base locale ({localRestaurants.length})
+                  Base locale ({localRestaurants.length - hiddenLocalIds.size})
                 </h3>
-                {localRestaurants.map((r) => (
-                  <RestoCard
-                    key={r.id}
-                    name={r.name}
-                    cuisine={r.cuisine}
-                    rating={r.rating}
-                    priceRange={r.priceRange}
-                    foodType={r.foodType}
-                    ambiance={r.ambiance}
-                    terrasse={r.terrasse}
-                    isNew={r.isNew}
-                    availableTables={r.availableTables}
-                  />
-                ))}
+                {localRestaurants
+                  .filter((r) => !hiddenLocalIds.has(r.id))
+                  .map((r) => (
+                    <RestoCard
+                      key={r.id}
+                      id={r.id}
+                      name={r.name}
+                      cuisine={r.cuisine}
+                      rating={r.rating}
+                      priceRange={r.priceRange}
+                      foodType={r.foodType}
+                      ambiance={r.ambiance}
+                      terrasse={r.terrasse}
+                      isNew={r.isNew}
+                      availableTables={r.availableTables}
+                      onDelete={() => handleDelete(r.id, true)}
+                    />
+                  ))}
               </div>
 
               <div className="space-y-3">
@@ -322,6 +326,7 @@ const CreatorPage = () => {
                 {dbRestaurants.map((r) => (
                   <RestoCard
                     key={r.id}
+                    id={r.id}
                     name={r.name}
                     cuisine={r.cuisine}
                     rating={r.rating ?? 0}
@@ -331,6 +336,7 @@ const CreatorPage = () => {
                     terrasse={!!r.terrasse}
                     isNew={!!r.is_new}
                     availableTables={r.available_tables ?? 0}
+                    onDelete={() => handleDelete(r.id, false)}
                   />
                 ))}
               </div>
