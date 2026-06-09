@@ -263,6 +263,10 @@ const QuizPage = () => {
                 {q.key === "guests" && (
                   <div className="space-y-3 pt-2">
                     <label className="flex items-center justify-between gap-3 cursor-pointer">
+                      <span className="font-body text-sm text-foreground">Besoin de menu enfant</span>
+                      <input type="checkbox" className="h-5 w-5 rounded border-border accent-[hsl(var(--accent))] cursor-pointer" />
+                    </label>
+                    <label className="flex items-center justify-between gap-3 cursor-pointer">
                       <span className="font-body text-sm text-foreground">Besoin de chaise haute pour enfant</span>
                       <input type="checkbox" className="h-5 w-5 rounded border-border accent-[hsl(var(--accent))] cursor-pointer" />
                     </label>
