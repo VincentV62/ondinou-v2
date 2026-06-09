@@ -301,7 +301,6 @@ const CreatorPage = () => {
                   .map((r) => (
                     <RestoCard
                       key={r.id}
-                      id={r.id}
                       name={r.name}
                       cuisine={r.cuisine}
                       rating={r.rating}
@@ -326,7 +325,6 @@ const CreatorPage = () => {
                 {dbRestaurants.map((r) => (
                   <RestoCard
                     key={r.id}
-                    id={r.id}
                     name={r.name}
                     cuisine={r.cuisine}
                     rating={r.rating ?? 0}
