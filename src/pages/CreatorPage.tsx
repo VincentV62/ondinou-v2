@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Check, Star, Users, Utensils } from "lucide-react";
+import { ArrowLeft, Check, Star, Trash2, Users, Utensils } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
@@ -60,6 +60,7 @@ const CreatorPage = () => {
   // List tab
   const [dbRestaurants, setDbRestaurants] = useState<RestoRow[]>([]);
   const [tab, setTab] = useState("create");
+  const [hiddenLocalIds, setHiddenLocalIds] = useState<Set<string>>(new Set());
 
   const loadRestaurants = async () => {
     const { data } = await supabase
@@ -75,6 +76,25 @@ const CreatorPage = () => {
 
   const toggle = (arr: string[], setArr: (v: string[]) => void, val: string) => {
     setArr(arr.includes(val) ? arr.filter((x) => x !== val) : [...arr, val]);
+  };
+
+  const handleDelete = async (id: string, isLocal: boolean) => {
+    const confirmed = window.confirm("Supprimer définitivement ce restaurant ?");
+    if (!confirmed) return;
+
+    if (isLocal) {
+      setHiddenLocalIds((prev) => new Set(prev).add(id));
+      toast.success("Restaurant retiré de la liste");
+      return;
+    }
+
+    const { error } = await supabase.from("restaurants").delete().eq("id", id);
+    if (error) {
+      toast.error("Erreur lors de la suppression : " + error.message);
+      return;
+    }
+    setDbRestaurants((prev) => prev.filter((r) => r.id !== id));
+    toast.success("Restaurant supprimé");
   };
 
   const handleSubmit = async () => {
@@ -131,6 +151,8 @@ const CreatorPage = () => {
     localStorage.setItem("fakeWeeklyUses", JSON.stringify(uses));
 
     toast.success(`✓ "${name}" ajouté à la base !`);
+    setTab("list");
+    loadRestaurants();
     setLoading(false);
     setName("");
     setDescription("");
@@ -272,22 +294,25 @@ const CreatorPage = () => {
 
               <div className="space-y-3">
                 <h3 className="font-heading text-sm font-semibold text-muted-foreground uppercase tracking-wide">
-                  Base locale ({localRestaurants.length})
+                  Base locale ({localRestaurants.length - hiddenLocalIds.size})
                 </h3>
-                {localRestaurants.map((r) => (
-                  <RestoCard
-                    key={r.id}
-                    name={r.name}
-                    cuisine={r.cuisine}
-                    rating={r.rating}
-                    priceRange={r.priceRange}
-                    foodType={r.foodType}
-                    ambiance={r.ambiance}
-                    terrasse={r.terrasse}
-                    isNew={r.isNew}
-                    availableTables={r.availableTables}
-                  />
-                ))}
+                {localRestaurants
+                  .filter((r) => !hiddenLocalIds.has(r.id))
+                  .map((r) => (
+                    <RestoCard
+                      key={r.id}
+                      name={r.name}
+                      cuisine={r.cuisine}
+                      rating={r.rating}
+                      priceRange={r.priceRange}
+                      foodType={r.foodType}
+                      ambiance={r.ambiance}
+                      terrasse={r.terrasse}
+                      isNew={r.isNew}
+                      availableTables={r.availableTables}
+                      onDelete={() => handleDelete(r.id, true)}
+                    />
+                  ))}
               </div>
 
               <div className="space-y-3">
@@ -309,6 +334,7 @@ const CreatorPage = () => {
                     terrasse={!!r.terrasse}
                     isNew={!!r.is_new}
                     availableTables={r.available_tables ?? 0}
+                    onDelete={() => handleDelete(r.id, false)}
                   />
                 ))}
               </div>
@@ -346,10 +372,11 @@ const Tag = ({ children }: { children: React.ReactNode }) => (
 );
 
 const RestoCard = ({
-  name, cuisine, rating, priceRange, foodType, ambiance, terrasse, isNew, availableTables,
+  name, cuisine, rating, priceRange, foodType, ambiance, terrasse, isNew, availableTables, onDelete,
 }: {
   name: string; cuisine: string; rating: number; priceRange: string;
   foodType: string[]; ambiance: string[]; terrasse: boolean; isNew: boolean; availableTables: number;
+  onDelete?: () => void;
 }) => (
   <div className="p-4 rounded-xl border border-border bg-card space-y-2">
     <div className="flex items-start justify-between gap-2">
@@ -359,8 +386,17 @@ const RestoCard = ({
           <Utensils className="w-3 h-3" /> {cuisine}
         </div>
       </div>
-      <div className="flex items-center gap-1 text-sm font-body">
+      <div className="flex items-center gap-2 text-sm font-body">
         <Star className="w-3.5 h-3.5 fill-accent text-accent" /> {rating.toFixed(1)}
+        {onDelete && (
+          <button
+            onClick={onDelete}
+            className="ml-1 p-1 rounded-md hover:bg-destructive/10 text-muted-foreground hover:text-destructive transition-colors"
+            title="Supprimer"
+          >
+            <Trash2 className="w-4 h-4" />
+          </button>
+        )}
       </div>
     </div>
 
