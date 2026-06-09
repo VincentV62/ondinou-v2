@@ -19,7 +19,7 @@ const questions: QuestionDef[] = [
   { key: "guests", titleKey: "q1", options: Array.from({ length: 15 }, (_, i) => String(i + 1)), dinouMsg: "Dis-moi ce qui te ferait plaisir aujourd'hui 😋", isDropdown: true },
   { key: "transport", titleKey: "q2", options: ["À pied", "En vélo", "En voiture", "En transports"], dinouMsg: "Super ! On continue…" },
   { key: "travelTime", titleKey: "q3", options: ["5 minutes", "15 minutes", "30 minutes", "Peu importe"], dinouMsg: "Hum… je commence à avoir une idée… 🤔" },
-  { key: "budget", titleKey: "q4", options: ["Menu à 20€ environ", "Menu entre 30€ et 50€", "Pas de limite, ce soir je me fais plaisir !"], dinouMsg: "Ça se précise…" },
+  { key: "budget", titleKey: "q4", options: ["Menu à 20€ environ", "Menu entre 30€ et 50€", "Pas de limite, je me fais plaisir !"], dinouMsg: "Ça se précise…" },
   { key: "food", titleKey: "q5", options: ["🍝 Italien", "🍣 Japonais", "🐟 Poisson", "🥩 Une bonne viande", "🥢 Asiatique", "🍽️ Estaminet", "✨ Bistronomie", "🥗 Végétarien / Vegan"], dinouMsg: "Miam miam 😋", isGrid: true },
   { key: "ambiance", titleKey: "q6", options: ["Cosy", "Branché", "Romantique", "Entre potes"], dinouMsg: "J'adore ton style !" },
   { key: "terrasse", titleKey: "q7", options: ["Oui", "Non", "Peu importe"], dinouMsg: "Bonne question…" },
