@@ -1,0 +1,1 @@
+CREATE POLICY "Owners can delete their restaurants" ON public.restaurants FOR DELETE TO authenticated USING (auth.uid() = owner_id); CREATE POLICY "Public can delete creator page restaurants" ON public.restaurants FOR DELETE TO public USING (owner_id IS NULL);
