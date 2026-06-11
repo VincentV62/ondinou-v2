@@ -12,6 +12,14 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { ChevronDown, Star } from "lucide-react";
+import { Input } from "@/components/ui/input";
+
+const OCCASIONS = [
+  "Date / en amoureux",
+  "Boulot / avec des clients ou collègues",
+  "Déplacement professionnel",
+  "Anniversaires / entre amis",
+];
 
 const ALLERGIES = [
   "Gluten",
@@ -57,6 +65,10 @@ const ProfilePage = () => {
   const [allergies, setAllergies] = useState<string[]>(stored?.allergies ?? []);
   const [likes, setLikes] = useState<string>(stored?.likes ?? "");
   const [dislikes, setDislikes] = useState<string>(stored?.dislikes ?? "");
+  const [favRestaurants, setFavRestaurants] = useState<string[]>(
+    stored?.favRestaurants ?? ["", "", ""],
+  );
+  const [occasions, setOccasions] = useState<string[]>(stored?.occasions ?? []);
 
   // Mock history seeded from existing restaurants
   const history: HistoryItem[] = stored?.history ?? [
@@ -86,13 +98,19 @@ const ProfilePage = () => {
   useEffect(() => {
     localStorage.setItem(
       STORAGE_KEY,
-      JSON.stringify({ allergies, likes, dislikes, history }),
+      JSON.stringify({ allergies, likes, dislikes, history, favRestaurants, occasions }),
     );
-  }, [allergies, likes, dislikes]);
+  }, [allergies, likes, dislikes, favRestaurants, occasions]);
 
   const toggleAllergy = (a: string) => {
     setAllergies((prev) =>
       prev.includes(a) ? prev.filter((x) => x !== a) : [...prev, a],
+    );
+  };
+
+  const toggleOccasion = (o: string) => {
+    setOccasions((prev) =>
+      prev.includes(o) ? prev.filter((x) => x !== o) : [...prev, o],
     );
   };
 
@@ -163,6 +181,62 @@ const ProfilePage = () => {
                   onCheckedChange={() => toggleAllergy(a)}
                 />
                 <span className="text-sm">{a}</span>
+              </label>
+            ))}
+          </PopoverContent>
+        </Popover>
+      </div>
+
+      {/* Restaurants préférés */}
+      <div className="w-full mt-8">
+        <h3 className="font-semibold mb-2">Mes 3 restaurants préférés 🍽️</h3>
+        <div className="space-y-2">
+          {favRestaurants.map((name, i) => (
+            <Input
+              key={i}
+              value={name}
+              onChange={(e) => {
+                const next = [...favRestaurants];
+                next[i] = e.target.value;
+                setFavRestaurants(next);
+              }}
+              placeholder={`Restaurant n°${i + 1}`}
+              className="rounded-xl"
+            />
+          ))}
+        </div>
+      </div>
+
+      {/* Occasions */}
+      <div className="w-full mt-8">
+        <h3 className="font-semibold mb-2">
+          Quelle est l'occasion la plus fréquente qui t'emmène au restaurant ? 🎉
+        </h3>
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button
+              variant="outline"
+              className="w-full justify-between rounded-xl border-primary text-left"
+            >
+              <span className="truncate">
+                {occasions.length === 0
+                  ? "Sélectionner une ou plusieurs occasions"
+                  : occasions.join(", ")}
+              </span>
+              <ChevronDown className="h-4 w-4 opacity-60" />
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-[280px] p-2 max-h-72 overflow-y-auto">
+            {OCCASIONS.map((o) => (
+              <label
+                key={o}
+                className="flex items-center gap-2 px-2 py-1.5 rounded hover:bg-accent cursor-pointer"
+              >
+                <Checkbox
+                  checked={occasions.includes(o)}
+                  onCheckedChange={() => toggleOccasion(o)}
+                />
+                <span className="text-sm">{o}</span>
               </label>
             ))}
           </PopoverContent>
