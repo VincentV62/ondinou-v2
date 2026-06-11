@@ -12,6 +12,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { ChevronDown, Star } from "lucide-react";
+import { Input } from "@/components/ui/input";
 
 const ALLERGIES = [
   "Gluten",
