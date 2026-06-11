@@ -14,6 +14,13 @@ import {
 import { ChevronDown, Star } from "lucide-react";
 import { Input } from "@/components/ui/input";
 
+const OCCASIONS = [
+  "Date / en amoureux",
+  "Boulot / avec des clients ou collègues",
+  "Déplacement professionnel",
+  "Anniversaires / entre amis",
+];
+
 const ALLERGIES = [
   "Gluten",
   "Arachides",
