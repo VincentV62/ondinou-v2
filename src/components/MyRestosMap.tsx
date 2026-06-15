@@ -196,7 +196,10 @@ const MyRestosMap = ({ favoriteNames, history }: Props) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [restos.map((r) => r.name).join("|")]);
 
-  const placedRestos = restos.filter((r) => r.lat != null && r.lng != null);
+  // Filter out coords outside the Lille metro (purges bad legacy cache entries)
+  const placedRestos = restos.filter(
+    (r) => r.lat != null && r.lng != null && inLille(r.lat!, r.lng!),
+  );
   const visibleRestos = placedRestos.filter((r) => visibleIds.includes(r.id));
 
   return (
@@ -204,9 +207,18 @@ const MyRestosMap = ({ favoriteNames, history }: Props) => {
       <MapContainer
         center={LILLE_CENTER}
         zoom={13}
+        minZoom={11}
+        maxZoom={18}
         scrollWheelZoom
+        maxBounds={[
+          [LILLE_BBOX.minLat, LILLE_BBOX.minLng],
+          [LILLE_BBOX.maxLat, LILLE_BBOX.maxLng],
+        ]}
+        maxBoundsViscosity={1.0}
+        worldCopyJump={false}
         className="w-full h-full z-0"
       >
+
         <TileLayer
           attribution='&copy; OpenStreetMap'
           url="https://{s}.tile.openstreetmap.org/{z}/{y}/{x}.png"
