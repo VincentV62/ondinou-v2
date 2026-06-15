@@ -28,6 +28,14 @@ interface HistoryItem {
 const LILLE_CENTER: [number, number] = [50.6292, 3.0573];
 const GEOCACHE_KEY = "ondinou_geocache_v1";
 
+// Lille metropolis bounding box (approx)
+const LILLE_BBOX = { minLat: 50.55, maxLat: 50.78, minLng: 2.9, maxLng: 3.25 };
+const inLille = (lat: number, lng: number) =>
+  lat >= LILLE_BBOX.minLat &&
+  lat <= LILLE_BBOX.maxLat &&
+  lng >= LILLE_BBOX.minLng &&
+  lng <= LILLE_BBOX.maxLng;
+
 // Custom dinou marker icon
 const dinouIcon = L.icon({
   iconUrl: dinouLogo,
@@ -40,8 +48,8 @@ const dinouIcon = L.icon({
 const loadCache = (): Record<string, [number, number]> => {
   try {
     const raw = JSON.parse(localStorage.getItem(GEOCACHE_KEY) || "{}");
-    // Purge any legacy entry outside Lille (typical bug: generic restaurant
-    // names previously resolved to places in South America, etc.)
+    // Purge any legacy entry outside Lille (e.g. generic restaurant names
+    // previously resolved to places in South America).
     const cleaned: Record<string, [number, number]> = {};
     for (const [k, v] of Object.entries(raw as Record<string, [number, number]>)) {
       if (Array.isArray(v) && inLille(v[0], v[1])) cleaned[k] = v;
