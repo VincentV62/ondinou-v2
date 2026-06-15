@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/popover";
 import { ChevronDown, Star } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import MyRestosMap from "@/components/MyRestosMap";
 
 const OCCASIONS = [
   "Date / en amoureux",
