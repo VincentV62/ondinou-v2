@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/popover";
 import { ChevronDown, Star } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import MyRestosMap from "@/components/MyRestosMap";
 
 const OCCASIONS = [
   "Date / en amoureux",
@@ -62,6 +63,7 @@ const ProfilePage = () => {
   const user = { name: "Vincent", dinous: 320, friends: 8, rank: 2 };
 
   const stored = loadProfile();
+  const [tab, setTab] = useState<"infos" | "restos">("infos");
   const [allergies, setAllergies] = useState<string[]>(stored?.allergies ?? []);
   const [likes, setLikes] = useState<string>(stored?.likes ?? "");
   const [dislikes, setDislikes] = useState<string>(stored?.dislikes ?? "");
@@ -116,6 +118,42 @@ const ProfilePage = () => {
 
   return (
     <main className="flex flex-col items-center h-full bg-background text-foreground px-4 py-6 overflow-y-auto pb-24">
+      {/* Sliding tabs */}
+      <div className="w-full max-w-md mb-4">
+        <div className="relative grid grid-cols-2 bg-secondary rounded-2xl p-1">
+          <div
+            className={`absolute top-1 bottom-1 w-[calc(50%-0.25rem)] rounded-xl bg-primary shadow transition-all duration-300 ${
+              tab === "infos" ? "left-1" : "left-[calc(50%+0rem)]"
+            }`}
+          />
+          <button
+            onClick={() => setTab("infos")}
+            className={`relative z-10 py-2 text-sm font-semibold rounded-xl transition-colors ${
+              tab === "infos" ? "text-primary-foreground" : "text-foreground/70"
+            }`}
+          >
+            Mes infos
+          </button>
+          <button
+            onClick={() => setTab("restos")}
+            className={`relative z-10 py-2 text-sm font-semibold rounded-xl transition-colors ${
+              tab === "restos" ? "text-primary-foreground" : "text-foreground/70"
+            }`}
+          >
+            Mes restos
+          </button>
+        </div>
+      </div>
+
+      {tab === "restos" ? (
+        <div className="w-full">
+          <MyRestosMap favoriteNames={favRestaurants} history={history} />
+          <p className="text-xs text-muted-foreground text-center mt-3">
+            Survole un logo Ondinou pour voir le détail du restaurant.
+          </p>
+        </div>
+      ) : (
+      <>
       {/* Profil */}
       <div className="flex flex-col items-center mt-4">
         <div className="w-20 h-20 rounded-full bg-secondary flex items-center justify-center text-3xl font-bold text-primary">
@@ -338,6 +376,8 @@ const ProfilePage = () => {
       >
         Voir mon classement 🚀
       </Button>
+      </>
+      )}
     </main>
   );
 };
