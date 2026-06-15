@@ -376,6 +376,8 @@ const ProfilePage = () => {
       >
         Voir mon classement 🚀
       </Button>
+      </>
+      )}
     </main>
   );
 };
