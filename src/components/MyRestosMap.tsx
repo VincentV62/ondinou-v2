@@ -62,13 +62,6 @@ const loadCache = (): Record<string, [number, number]> => {
 const saveCache = (c: Record<string, [number, number]>) =>
   localStorage.setItem(GEOCACHE_KEY, JSON.stringify(c));
 
-// Lille metropolis bounding box (approx)
-const LILLE_BBOX = { minLat: 50.55, maxLat: 50.78, minLng: 2.9, maxLng: 3.25 };
-const inLille = (lat: number, lng: number) =>
-  lat >= LILLE_BBOX.minLat &&
-  lat <= LILLE_BBOX.maxLat &&
-  lng >= LILLE_BBOX.minLng &&
-  lng <= LILLE_BBOX.maxLng;
 
 async function geocode(q: string): Promise<[number, number] | null> {
   try {
