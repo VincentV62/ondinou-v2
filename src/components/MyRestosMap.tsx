@@ -39,7 +39,14 @@ const dinouIcon = L.icon({
 
 const loadCache = (): Record<string, [number, number]> => {
   try {
-    return JSON.parse(localStorage.getItem(GEOCACHE_KEY) || "{}");
+    const raw = JSON.parse(localStorage.getItem(GEOCACHE_KEY) || "{}");
+    // Purge any legacy entry outside Lille (typical bug: generic restaurant
+    // names previously resolved to places in South America, etc.)
+    const cleaned: Record<string, [number, number]> = {};
+    for (const [k, v] of Object.entries(raw as Record<string, [number, number]>)) {
+      if (Array.isArray(v) && inLille(v[0], v[1])) cleaned[k] = v;
+    }
+    return cleaned;
   } catch {
     return {};
   }
