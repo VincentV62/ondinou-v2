@@ -28,6 +28,14 @@ interface HistoryItem {
 const LILLE_CENTER: [number, number] = [50.6292, 3.0573];
 const GEOCACHE_KEY = "ondinou_geocache_v1";
 
+// Lille metropolis bounding box (approx)
+const LILLE_BBOX = { minLat: 50.55, maxLat: 50.78, minLng: 2.9, maxLng: 3.25 };
+const inLille = (lat: number, lng: number) =>
+  lat >= LILLE_BBOX.minLat &&
+  lat <= LILLE_BBOX.maxLat &&
+  lng >= LILLE_BBOX.minLng &&
+  lng <= LILLE_BBOX.maxLng;
+
 // Custom dinou marker icon
 const dinouIcon = L.icon({
   iconUrl: dinouLogo,
@@ -39,7 +47,14 @@ const dinouIcon = L.icon({
 
 const loadCache = (): Record<string, [number, number]> => {
   try {
-    return JSON.parse(localStorage.getItem(GEOCACHE_KEY) || "{}");
+    const raw = JSON.parse(localStorage.getItem(GEOCACHE_KEY) || "{}");
+    // Purge any legacy entry outside Lille (e.g. generic restaurant names
+    // previously resolved to places in South America).
+    const cleaned: Record<string, [number, number]> = {};
+    for (const [k, v] of Object.entries(raw as Record<string, [number, number]>)) {
+      if (Array.isArray(v) && inLille(v[0], v[1])) cleaned[k] = v;
+    }
+    return cleaned;
   } catch {
     return {};
   }
@@ -47,14 +62,23 @@ const loadCache = (): Record<string, [number, number]> => {
 const saveCache = (c: Record<string, [number, number]>) =>
   localStorage.setItem(GEOCACHE_KEY, JSON.stringify(c));
 
+
 async function geocode(q: string): Promise<[number, number] | null> {
   try {
-    const r = await fetch(
-      `https://nominatim.openstreetmap.org/search?format=json&limit=1&q=${encodeURIComponent(q)}`,
-      { headers: { Accept: "application/json" } },
-    );
+    // Restrict search to France + Lille viewbox so generic names don't return South America
+    const url =
+      `https://nominatim.openstreetmap.org/search?format=json&limit=1` +
+      `&countrycodes=fr&bounded=1&viewbox=2.9,50.78,3.25,50.55` +
+      `&q=${encodeURIComponent(q)}`;
+    const r = await fetch(url, { headers: { Accept: "application/json" } });
     const data = await r.json();
-    if (data?.[0]) return [parseFloat(data[0].lat), parseFloat(data[0].lon)];
+    if (data?.[0]) {
+      const lat = parseFloat(data[0].lat);
+      const lng = parseFloat(data[0].lon);
+      if (Number.isFinite(lat) && Number.isFinite(lng) && inLille(lat, lng)) {
+        return [lat, lng];
+      }
+    }
   } catch {}
   return null;
 }
@@ -180,7 +204,10 @@ const MyRestosMap = ({ favoriteNames, history }: Props) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [restos.map((r) => r.name).join("|")]);
 
-  const placedRestos = restos.filter((r) => r.lat != null && r.lng != null);
+  // Filter out coords outside the Lille metro (purges bad legacy cache entries)
+  const placedRestos = restos.filter(
+    (r) => r.lat != null && r.lng != null && inLille(r.lat!, r.lng!),
+  );
   const visibleRestos = placedRestos.filter((r) => visibleIds.includes(r.id));
 
   return (
@@ -188,9 +215,18 @@ const MyRestosMap = ({ favoriteNames, history }: Props) => {
       <MapContainer
         center={LILLE_CENTER}
         zoom={13}
+        minZoom={11}
+        maxZoom={18}
         scrollWheelZoom
+        maxBounds={[
+          [LILLE_BBOX.minLat, LILLE_BBOX.minLng],
+          [LILLE_BBOX.maxLat, LILLE_BBOX.maxLng],
+        ]}
+        maxBoundsViscosity={1.0}
+        worldCopyJump={false}
         className="w-full h-full z-0"
       >
+
         <TileLayer
           attribution='&copy; OpenStreetMap'
           url="https://{s}.tile.openstreetmap.org/{z}/{y}/{x}.png"
