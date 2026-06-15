@@ -63,6 +63,7 @@ const ProfilePage = () => {
   const user = { name: "Vincent", dinous: 320, friends: 8, rank: 2 };
 
   const stored = loadProfile();
+  const [tab, setTab] = useState<"infos" | "restos">("infos");
   const [allergies, setAllergies] = useState<string[]>(stored?.allergies ?? []);
   const [likes, setLikes] = useState<string>(stored?.likes ?? "");
   const [dislikes, setDislikes] = useState<string>(stored?.dislikes ?? "");
