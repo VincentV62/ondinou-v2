@@ -26,15 +26,16 @@ interface HistoryItem {
 }
 
 const LILLE_CENTER: [number, number] = [50.6292, 3.0573];
-const GEOCACHE_KEY = "ondinou_geocache_v1";
+const GEOCACHE_KEY = "ondinou_geocache_nord_v2";
 
-// Lille metropolis bounding box (approx)
-const LILLE_BBOX = { minLat: 50.55, maxLat: 50.78, minLng: 2.9, maxLng: 3.25 };
-const inLille = (lat: number, lng: number) =>
-  lat >= LILLE_BBOX.minLat &&
-  lat <= LILLE_BBOX.maxLat &&
-  lng >= LILLE_BBOX.minLng &&
-  lng <= LILLE_BBOX.maxLng;
+// Département du Nord + focus Métropole Européenne de Lille.
+const NORD_BBOX = { minLat: 49.95, maxLat: 51.1, minLng: 2.05, maxLng: 4.35 };
+const MEL_BBOX = { minLat: 50.52, maxLat: 50.82, minLng: 2.78, maxLng: 3.35 };
+const inNord = (lat: number, lng: number) =>
+  lat >= NORD_BBOX.minLat &&
+  lat <= NORD_BBOX.maxLat &&
+  lng >= NORD_BBOX.minLng &&
+  lng <= NORD_BBOX.maxLng;
 
 // Custom dinou marker icon
 const dinouIcon = L.icon({
