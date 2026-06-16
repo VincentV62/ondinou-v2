@@ -28,9 +28,8 @@ interface HistoryItem {
 const LILLE_CENTER: [number, number] = [50.6292, 3.0573];
 const GEOCACHE_KEY = "ondinou_geocache_nord_v2";
 
-// Département du Nord + focus Métropole Européenne de Lille.
+// Département du Nord, France.
 const NORD_BBOX = { minLat: 49.95, maxLat: 51.1, minLng: 2.05, maxLng: 4.35 };
-const MEL_BBOX = { minLat: 50.52, maxLat: 50.82, minLng: 2.78, maxLng: 3.35 };
 const inNord = (lat: number, lng: number) =>
   lat >= NORD_BBOX.minLat &&
   lat <= NORD_BBOX.maxLat &&
@@ -248,8 +247,8 @@ const MyRestosMap = ({ favoriteNames, history }: Props) => {
     <div className="relative w-full h-[70vh] rounded-2xl overflow-hidden border-2 border-primary/30">
       <MapContainer
         center={LILLE_CENTER}
-        zoom={13}
-        minZoom={11}
+        zoom={10}
+        minZoom={8}
         maxZoom={18}
         scrollWheelZoom
         maxBounds={[
