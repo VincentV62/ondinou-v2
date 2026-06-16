@@ -238,9 +238,9 @@ const MyRestosMap = ({ favoriteNames, history }: Props) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [restos.map((r) => r.name).join("|")]);
 
-  // Filter out coords outside the Lille metro (purges bad legacy cache entries)
+  // Filter out coords outside the Nord department (purges bad legacy cache entries)
   const placedRestos = restos.filter(
-    (r) => r.lat != null && r.lng != null && inLille(r.lat!, r.lng!),
+    (r) => r.lat != null && r.lng != null && inNord(r.lat!, r.lng!),
   );
   const visibleRestos = placedRestos.filter((r) => visibleIds.includes(r.id));
 
@@ -253,8 +253,8 @@ const MyRestosMap = ({ favoriteNames, history }: Props) => {
         maxZoom={18}
         scrollWheelZoom
         maxBounds={[
-          [LILLE_BBOX.minLat, LILLE_BBOX.minLng],
-          [LILLE_BBOX.maxLat, LILLE_BBOX.maxLng],
+          [NORD_BBOX.minLat, NORD_BBOX.minLng],
+          [NORD_BBOX.maxLat, NORD_BBOX.maxLng],
         ]}
         maxBoundsViscosity={1.0}
         worldCopyJump={false}
