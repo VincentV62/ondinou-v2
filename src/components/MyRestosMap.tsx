@@ -26,8 +26,12 @@ interface HistoryItem {
 }
 
 const LILLE_CENTER: [number, number] = [50.633333, 3.066667];
-const GEOCACHE_KEY = "ondinou_geocache_lille_nord_v3";
-const LEGACY_GEOCACHE_KEYS = ["ondinou_geocache_v1", "ondinou_geocache_nord_v2"];
+const GEOCACHE_KEY = "ondinou_geocache_lille_nord_v4";
+const LEGACY_GEOCACHE_KEYS = [
+  "ondinou_geocache_v1",
+  "ondinou_geocache_nord_v2",
+  "ondinou_geocache_lille_nord_v3",
+];
 
 // Département du Nord, France.
 const NORD_BBOX = { minLat: 49.95, maxLat: 51.1, minLng: 2.05, maxLng: 4.35 };
@@ -48,6 +52,7 @@ const dinouIcon = L.icon({
 
 const loadCache = (): Record<string, [number, number]> => {
   try {
+    LEGACY_GEOCACHE_KEYS.forEach((key) => localStorage.removeItem(key));
     const raw = JSON.parse(localStorage.getItem(GEOCACHE_KEY) || "{}");
     // Purge any legacy entry outside Northern France (e.g. generic restaurant names
     // previously resolved to places in South America).
@@ -142,29 +147,6 @@ function BoundsWatcher({ onChange }: { onChange: (ids: string[]) => void }) {
     compute();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [restos?.length]);
-  return null;
-}
-
-function MapResetGuard() {
-  const map = useMap();
-  const keepInNord = () => {
-    const center = map.getCenter();
-    if (!inNord(center.lat, center.lng)) {
-      map.setView(LILLE_CENTER, 10, { animate: false });
-    }
-  };
-
-  useMapEvents({ moveend: keepInNord, zoomend: keepInNord });
-
-  useEffect(() => {
-    map.setMaxBounds([
-      [NORD_BBOX.minLat, NORD_BBOX.minLng],
-      [NORD_BBOX.maxLat, NORD_BBOX.maxLng],
-    ]);
-    map.setView(LILLE_CENTER, 10, { animate: false });
-    setTimeout(() => map.invalidateSize(), 0);
-  }, [map]);
-
   return null;
 }
 
@@ -280,11 +262,6 @@ const MyRestosMap = ({ favoriteNames, history }: Props) => {
         minZoom={8}
         maxZoom={18}
         scrollWheelZoom
-        maxBounds={[
-          [NORD_BBOX.minLat, NORD_BBOX.minLng],
-          [NORD_BBOX.maxLat, NORD_BBOX.maxLng],
-        ]}
-        maxBoundsViscosity={1.0}
         worldCopyJump={false}
         className="w-full h-full z-0"
       >
@@ -292,6 +269,7 @@ const MyRestosMap = ({ favoriteNames, history }: Props) => {
         <TileLayer
           attribution='&copy; OpenStreetMap'
           url="https://{s}.tile.openstreetmap.org/{z}/{y}/{x}.png"
+          noWrap
         />
         {placedRestos.map((r) => (
           <Marker
@@ -328,7 +306,6 @@ const MyRestosMap = ({ favoriteNames, history }: Props) => {
             </Popup>
           </Marker>
         ))}
-        <MapResetGuard />
         <BoundsWatcher onChange={setVisibleIds} />
       </MapContainer>
 
