@@ -63,21 +63,54 @@ const saveCache = (c: Record<string, [number, number]>) =>
   localStorage.setItem(GEOCACHE_KEY, JSON.stringify(c));
 
 
+// Communes de la Métropole Européenne de Lille (MEL)
+const MEL_COMMUNES = new Set(
+  [
+    "lille","lambersart","la madeleine","marcq-en-baroeul","mons-en-baroeul","villeneuve-d'ascq",
+    "roubaix","tourcoing","wasquehal","croix","hem","lys-lez-lannoy","lannoy","leers",
+    "wattrelos","neuville-en-ferrain","halluin","bondues","mouvaux","marquette-lez-lille",
+    "saint-andré-lez-lille","saint-andre-lez-lille","wambrechies","quesnoy-sur-deûle","quesnoy-sur-deule",
+    "haubourdin","loos","sequedin","englos","capinghem","lomme","hellemmes","faches-thumesnil",
+    "ronchin","lesquin","wattignies","templemars","vendeville","seclin","houplin-ancoisne",
+    "noyelles-lès-seclin","noyelles-les-seclin","emmerin","santes","hallennes-lez-haubourdin",
+    "wavrin","don","la bassée","la bassee","fournes-en-weppes","fromelles","aubers","bois-grenier",
+    "armentières","armentieres","houplines","frelinghien","deûlémont","deulemont","warneton",
+    "comines","wervicq-sud","linselles","roncq","bousbecque","tressin","chéreng","chereng",
+    "anstaing","forest-sur-marque","sainghin-en-mélantois","sailly-lez-lannoy","willems",
+    "baisieux","gruson","péronne-en-mélantois","peronne-en-melantois","bouvines",
+  ].map((s) => s.toLowerCase()),
+);
+
 async function geocode(q: string): Promise<[number, number] | null> {
   try {
-    // Restrict search to France + Lille viewbox so generic names don't return South America
     const url =
-      `https://nominatim.openstreetmap.org/search?format=json&limit=1` +
+      `https://nominatim.openstreetmap.org/search?format=json&limit=5&addressdetails=1` +
       `&countrycodes=fr&bounded=1&viewbox=2.9,50.78,3.25,50.55` +
       `&q=${encodeURIComponent(q)}`;
     const r = await fetch(url, { headers: { Accept: "application/json" } });
     const data = await r.json();
-    if (data?.[0]) {
-      const lat = parseFloat(data[0].lat);
-      const lng = parseFloat(data[0].lon);
-      if (Number.isFinite(lat) && Number.isFinite(lng) && inLille(lat, lng)) {
-        return [lat, lng];
-      }
+    if (!Array.isArray(data)) return null;
+    for (const item of data) {
+      const lat = parseFloat(item.lat);
+      const lng = parseFloat(item.lon);
+      if (!Number.isFinite(lat) || !Number.isFinite(lng)) continue;
+      if (!inLille(lat, lng)) continue;
+      const addr = item.address ?? {};
+      // Le département doit être le Nord (59)
+      const postcode: string = addr.postcode ?? "";
+      if (postcode && !postcode.startsWith("59")) continue;
+      const candidates = [
+        addr.city, addr.town, addr.village, addr.municipality,
+        addr.suburb, addr.city_district, addr.county,
+      ]
+        .filter(Boolean)
+        .map((s: string) => s.toLowerCase());
+      const isMEL =
+        candidates.some((c) => MEL_COMMUNES.has(c)) ||
+        candidates.some(
+          (c) => c.includes("lille") || c.includes("métropole") || c.includes("metropole"),
+        );
+      if (isMEL) return [lat, lng];
     }
   } catch {}
   return null;
