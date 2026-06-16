@@ -268,7 +268,7 @@ const MyRestosMap = ({ favoriteNames, history }: Props) => {
 
         <TileLayer
           attribution='&copy; OpenStreetMap'
-          url="https://{s}.tile.openstreetmap.org/{z}/{y}/{x}.png"
+          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           noWrap
         />
         {placedRestos.map((r) => (
