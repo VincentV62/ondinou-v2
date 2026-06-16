@@ -26,15 +26,15 @@ interface HistoryItem {
 }
 
 const LILLE_CENTER: [number, number] = [50.6292, 3.0573];
-const GEOCACHE_KEY = "ondinou_geocache_v1";
+const GEOCACHE_KEY = "ondinou_geocache_nord_v2";
 
-// Lille metropolis bounding box (approx)
-const LILLE_BBOX = { minLat: 50.55, maxLat: 50.78, minLng: 2.9, maxLng: 3.25 };
-const inLille = (lat: number, lng: number) =>
-  lat >= LILLE_BBOX.minLat &&
-  lat <= LILLE_BBOX.maxLat &&
-  lng >= LILLE_BBOX.minLng &&
-  lng <= LILLE_BBOX.maxLng;
+// Département du Nord, France.
+const NORD_BBOX = { minLat: 49.95, maxLat: 51.1, minLng: 2.05, maxLng: 4.35 };
+const inNord = (lat: number, lng: number) =>
+  lat >= NORD_BBOX.minLat &&
+  lat <= NORD_BBOX.maxLat &&
+  lng >= NORD_BBOX.minLng &&
+  lng <= NORD_BBOX.maxLng;
 
 // Custom dinou marker icon
 const dinouIcon = L.icon({
@@ -48,11 +48,11 @@ const dinouIcon = L.icon({
 const loadCache = (): Record<string, [number, number]> => {
   try {
     const raw = JSON.parse(localStorage.getItem(GEOCACHE_KEY) || "{}");
-    // Purge any legacy entry outside Lille (e.g. generic restaurant names
+    // Purge any legacy entry outside Northern France (e.g. generic restaurant names
     // previously resolved to places in South America).
     const cleaned: Record<string, [number, number]> = {};
     for (const [k, v] of Object.entries(raw as Record<string, [number, number]>)) {
-      if (Array.isArray(v) && inLille(v[0], v[1])) cleaned[k] = v;
+      if (Array.isArray(v) && inNord(v[0], v[1])) cleaned[k] = v;
     }
     return cleaned;
   } catch {
@@ -84,8 +84,8 @@ const MEL_COMMUNES = new Set(
 async function geocode(q: string): Promise<[number, number] | null> {
   try {
     const url =
-      `https://nominatim.openstreetmap.org/search?format=json&limit=5&addressdetails=1` +
-      `&countrycodes=fr&bounded=1&viewbox=2.9,50.78,3.25,50.55` +
+      `https://nominatim.openstreetmap.org/search?format=json&limit=8&addressdetails=1` +
+      `&countrycodes=fr&bounded=1&viewbox=${NORD_BBOX.minLng},${NORD_BBOX.maxLat},${NORD_BBOX.maxLng},${NORD_BBOX.minLat}` +
       `&q=${encodeURIComponent(q)}`;
     const r = await fetch(url, { headers: { Accept: "application/json" } });
     const data = await r.json();
@@ -94,7 +94,7 @@ async function geocode(q: string): Promise<[number, number] | null> {
       const lat = parseFloat(item.lat);
       const lng = parseFloat(item.lon);
       if (!Number.isFinite(lat) || !Number.isFinite(lng)) continue;
-      if (!inLille(lat, lng)) continue;
+      if (!inNord(lat, lng)) continue;
       const addr = item.address ?? {};
       // Le département doit être le Nord (59)
       const postcode: string = addr.postcode ?? "";
@@ -110,7 +110,7 @@ async function geocode(q: string): Promise<[number, number] | null> {
         candidates.some(
           (c) => c.includes("lille") || c.includes("métropole") || c.includes("metropole"),
         );
-      if (isMEL) return [lat, lng];
+      if (postcode.startsWith("59") || isMEL) return [lat, lng];
     }
   } catch {}
   return null;
@@ -237,9 +237,9 @@ const MyRestosMap = ({ favoriteNames, history }: Props) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [restos.map((r) => r.name).join("|")]);
 
-  // Filter out coords outside the Lille metro (purges bad legacy cache entries)
+  // Filter out coords outside the Nord department (purges bad legacy cache entries)
   const placedRestos = restos.filter(
-    (r) => r.lat != null && r.lng != null && inLille(r.lat!, r.lng!),
+    (r) => r.lat != null && r.lng != null && inNord(r.lat!, r.lng!),
   );
   const visibleRestos = placedRestos.filter((r) => visibleIds.includes(r.id));
 
@@ -247,13 +247,13 @@ const MyRestosMap = ({ favoriteNames, history }: Props) => {
     <div className="relative w-full h-[70vh] rounded-2xl overflow-hidden border-2 border-primary/30">
       <MapContainer
         center={LILLE_CENTER}
-        zoom={13}
-        minZoom={11}
+        zoom={10}
+        minZoom={8}
         maxZoom={18}
         scrollWheelZoom
         maxBounds={[
-          [LILLE_BBOX.minLat, LILLE_BBOX.minLng],
-          [LILLE_BBOX.maxLat, LILLE_BBOX.maxLng],
+          [NORD_BBOX.minLat, NORD_BBOX.minLng],
+          [NORD_BBOX.maxLat, NORD_BBOX.maxLng],
         ]}
         maxBoundsViscosity={1.0}
         worldCopyJump={false}
