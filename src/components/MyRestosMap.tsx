@@ -25,8 +25,9 @@ interface HistoryItem {
   review?: string;
 }
 
-const LILLE_CENTER: [number, number] = [50.6292, 3.0573];
-const GEOCACHE_KEY = "ondinou_geocache_nord_v2";
+const LILLE_CENTER: [number, number] = [50.633333, 3.066667];
+const GEOCACHE_KEY = "ondinou_geocache_lille_nord_v3";
+const LEGACY_GEOCACHE_KEYS = ["ondinou_geocache_v1", "ondinou_geocache_nord_v2"];
 
 // Département du Nord, France.
 const NORD_BBOX = { minLat: 49.95, maxLat: 51.1, minLng: 2.05, maxLng: 4.35 };
@@ -144,6 +145,29 @@ function BoundsWatcher({ onChange }: { onChange: (ids: string[]) => void }) {
   return null;
 }
 
+function MapResetGuard() {
+  const map = useMap();
+  const keepInNord = () => {
+    const center = map.getCenter();
+    if (!inNord(center.lat, center.lng)) {
+      map.setView(LILLE_CENTER, 10, { animate: false });
+    }
+  };
+
+  useMapEvents({ moveend: keepInNord, zoomend: keepInNord });
+
+  useEffect(() => {
+    map.setMaxBounds([
+      [NORD_BBOX.minLat, NORD_BBOX.minLng],
+      [NORD_BBOX.maxLat, NORD_BBOX.maxLng],
+    ]);
+    map.setView(LILLE_CENTER, 10, { animate: false });
+    setTimeout(() => map.invalidateSize(), 0);
+  }, [map]);
+
+  return null;
+}
+
 interface Props {
   favoriteNames: string[];
   history: HistoryItem[];
@@ -153,6 +177,10 @@ const MyRestosMap = ({ favoriteNames, history }: Props) => {
   const [coords, setCoords] = useState<Record<string, [number, number]>>(loadCache());
   const [panelOpen, setPanelOpen] = useState(true);
   const [visibleIds, setVisibleIds] = useState<string[]>([]);
+
+  useEffect(() => {
+    LEGACY_GEOCACHE_KEYS.forEach((key) => localStorage.removeItem(key));
+  }, []);
 
   // Build the list of restos to show
   const restos = useMemo<MapResto[]>(() => {
@@ -246,6 +274,7 @@ const MyRestosMap = ({ favoriteNames, history }: Props) => {
   return (
     <div className="relative w-full h-[70vh] rounded-2xl overflow-hidden border-2 border-primary/30">
       <MapContainer
+        key="lille-nord-map"
         center={LILLE_CENTER}
         zoom={10}
         minZoom={8}
@@ -299,6 +328,7 @@ const MyRestosMap = ({ favoriteNames, history }: Props) => {
             </Popup>
           </Marker>
         ))}
+        <MapResetGuard />
         <BoundsWatcher onChange={setVisibleIds} />
       </MapContainer>
 
