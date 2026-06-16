@@ -49,11 +49,11 @@ const dinouIcon = L.icon({
 const loadCache = (): Record<string, [number, number]> => {
   try {
     const raw = JSON.parse(localStorage.getItem(GEOCACHE_KEY) || "{}");
-    // Purge any legacy entry outside Lille (e.g. generic restaurant names
+    // Purge any legacy entry outside Northern France (e.g. generic restaurant names
     // previously resolved to places in South America).
     const cleaned: Record<string, [number, number]> = {};
     for (const [k, v] of Object.entries(raw as Record<string, [number, number]>)) {
-      if (Array.isArray(v) && inLille(v[0], v[1])) cleaned[k] = v;
+      if (Array.isArray(v) && inNord(v[0], v[1])) cleaned[k] = v;
     }
     return cleaned;
   } catch {
@@ -85,8 +85,8 @@ const MEL_COMMUNES = new Set(
 async function geocode(q: string): Promise<[number, number] | null> {
   try {
     const url =
-      `https://nominatim.openstreetmap.org/search?format=json&limit=5&addressdetails=1` +
-      `&countrycodes=fr&bounded=1&viewbox=2.9,50.78,3.25,50.55` +
+      `https://nominatim.openstreetmap.org/search?format=json&limit=8&addressdetails=1` +
+      `&countrycodes=fr&bounded=1&viewbox=${NORD_BBOX.minLng},${NORD_BBOX.maxLat},${NORD_BBOX.maxLng},${NORD_BBOX.minLat}` +
       `&q=${encodeURIComponent(q)}`;
     const r = await fetch(url, { headers: { Accept: "application/json" } });
     const data = await r.json();
@@ -95,7 +95,7 @@ async function geocode(q: string): Promise<[number, number] | null> {
       const lat = parseFloat(item.lat);
       const lng = parseFloat(item.lon);
       if (!Number.isFinite(lat) || !Number.isFinite(lng)) continue;
-      if (!inLille(lat, lng)) continue;
+      if (!inNord(lat, lng)) continue;
       const addr = item.address ?? {};
       // Le département doit être le Nord (59)
       const postcode: string = addr.postcode ?? "";
@@ -111,7 +111,7 @@ async function geocode(q: string): Promise<[number, number] | null> {
         candidates.some(
           (c) => c.includes("lille") || c.includes("métropole") || c.includes("metropole"),
         );
-      if (isMEL) return [lat, lng];
+      if (postcode.startsWith("59") || isMEL) return [lat, lng];
     }
   } catch {}
   return null;
