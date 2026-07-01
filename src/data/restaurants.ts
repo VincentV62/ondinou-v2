@@ -647,43 +647,100 @@ export const restaurants: Restaurant[] = [
   },
 ];
 
-export interface QuizAnswers {
-  guests: number;
-  transport: string;
-  travelTime: string;
-  budget: number;
-  food: string;
-  ambiance: string;
-  terrasse: string;
-  novelty: string;
-  detail: string;
+export type QuizAnswers = Record<string, string>;
+
+import { loadCategorizations } from "./quiz";
+
+// Weight per question when comparing user answer to resto categorization
+const QUESTION_WEIGHTS: Record<string, number> = {
+  q3: 30, q4: 25, q7: 20, q9: 15, q8: 12, q11: 10, q14: 10,
+  q10: 8, q12: 6, q13: 6, q15: 6, q16: 4, q17: 4, q1: 2, q2: 2, q5: 2,
+};
+
+function budgetFromQ7(v?: string): number | null {
+  if (!v) return null;
+  if (v.startsWith("Moins de 15")) return 0;
+  if (v.startsWith("15")) return 1;
+  if (v.startsWith("30")) return 2;
+  if (v.startsWith("50")) return 3;
+  if (v.startsWith("80")) return 3;
+  return null;
+}
+
+function maxMinutesFromQ6(v?: string): number {
+  if (!v) return 999;
+  if (v.startsWith("5")) return 5;
+  if (v.startsWith("10")) return 10;
+  if (v.startsWith("30")) return 30;
+  return 999;
 }
 
 export function matchRestaurants(answers: QuizAnswers): Restaurant[] {
-  const foodLabel = answers.food?.replace(/^[^\s]+\s/, "") || answers.food;
+  const cats = loadCategorizations();
+  const maxMin = maxMinutesFromQ6(answers.q6);
+  const userBudget = budgetFromQ7(answers.q7);
+  const q3 = answers.q3;
+  const q4 = answers.q4;
+  const q9 = answers.q9;
+  const q11 = answers.q11;
 
   return restaurants
     .map((r) => {
-      let score = 0;
-      // Food match +30
-      if (!foodLabel || foodLabel === "Surprise-moi" || r.foodType.includes(foodLabel)) score += 30;
-      // Ambiance match +25
-      if (r.ambiance.includes(answers.ambiance)) score += 25;
-      // Budget match +20
-      if (answers.budget === r.budget || answers.budget === 3) score += 20;
-      // Terrasse +10
-      if (answers.terrasse === "Peu importe" || (answers.terrasse === "Oui" && r.terrasse) || (answers.terrasse === "Non" && !r.terrasse)) score += 10;
-      // Tag match +5 each
-      r.tags.forEach((tag) => { if (r.ambiance.includes(tag)) score += 5; });
-      // Novelty
-      if (answers.novelty === "Nouveau" && r.isNew) score += 15;
-      if (answers.novelty === "Classique" && !r.isNew) score += 15;
-      // Travel time filter
-      const maxMin = answers.travelTime === "5 minutes" ? 5 : answers.travelTime === "15 minutes" ? 15 : answers.travelTime === "30 minutes" ? 30 : 999;
+      let score = r.rating * 2;
+      const cat = cats[r.id];
+
+      // Categorization-driven scoring (when creator has tagged the resto)
+      if (cat) {
+        for (const [qid, weight] of Object.entries(QUESTION_WEIGHTS)) {
+          const ua = answers[qid];
+          const ra = cat[qid];
+          if (!ua || !ra) continue;
+          if (ua === ra || ua.startsWith("Peu importe") || ra === "Peu importe") score += weight;
+        }
+      }
+
+      // Fallback heuristics on legacy fields (always applied)
+      if (q3 && q3 !== "Peu importe - Surprends-moi") {
+        const cuisineLower = r.cuisine.toLowerCase();
+        const map: Record<string, string[]> = {
+          "Cuisine française et du terroir": ["français", "brasserie", "estaminet", "ch'ti", "flamand", "bistrot", "bistronomique", "gastronomique"],
+          "Cuisine italienne et méditerranéenne": ["italien", "pizza", "pasta", "trattoria", "espagnol", "tapas", "grec", "libanais", "méditerra"],
+          "Cuisine asiatique": ["japonais", "sushi", "chinois", "thaï", "coréen", "indien", "asiatique", "ramen"],
+          "Viandes, grillades & plats généreux": ["viande", "steak", "burger", "grillade", "bbq", "boucher"],
+          "Poissons, fruits de mer & produits de la mer": ["poisson", "fruits de mer", "mer", "sushi", "huître"],
+          "Cuisine créative & tendance": ["bistronomique", "fusion", "végét", "vegan", "créati", "street"],
+        };
+        const kws = map[q3] || [];
+        if (kws.some((k) => cuisineLower.includes(k))) score += 20;
+      }
+      if (q4 && q4 !== "Peu importe") {
+        const kw = q4.toLowerCase().split(" ")[0];
+        if (r.cuisine.toLowerCase().includes(kw) || r.tags.some(t => t.toLowerCase().includes(kw))) score += 10;
+      }
+      if (userBudget !== null) {
+        if (Math.abs(r.budget - userBudget) === 0) score += 15;
+        else if (Math.abs(r.budget - userBudget) === 1) score += 5;
+      }
+      if (q9) {
+        const ambMap: Record<string, string[]> = {
+          "Intime et cosy": ["Cosy", "Romantique"],
+          "Animé et festif": ["Branché", "Festif", "Entre potes"],
+          "Chic et élégant": ["Romantique", "Cosy"],
+          "Décontracté et convivial": ["Convivial", "Entre potes"],
+          "Original ou atypique": ["Branché"],
+        };
+        if ((ambMap[q9] || []).some((a) => r.ambiance.includes(a))) score += 10;
+      }
+      if (q11) {
+        if (q11.startsWith("Grande") && r.terrasse) score += 8;
+        else if (q11.startsWith("Un coin") && r.terrasse) score += 4;
+        else if (q11.startsWith("Intérieur") && !r.terrasse) score += 4;
+      }
+
+      // Distance hard filter
       if (r.distanceMinutes > maxMin) score -= 50;
-      // Rating bonus
-      score += r.rating * 2;
-      return { ...r, score };
+
+      return { ...r, score } as Restaurant & { score: number };
     })
     .sort((a, b) => (b as any).score - (a as any).score);
 }

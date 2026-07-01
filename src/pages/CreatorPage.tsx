@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft, Check, Star, Trash2, Users, Utensils } from "lucide-react";
@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { restaurants as localRestaurants } from "@/data/restaurants";
+import { QUESTIONS, loadCategorizations, saveCategorization } from "@/data/quiz";
 
 const FOOD_TYPES = ["Italien", "Japonais", "Poisson", "Viande", "Asiatique", "Estaminet", "Bistronomie", "Végétarien"];
 const AMBIANCES = ["Cosy", "Branché", "Romantique", "Entre potes"];
@@ -178,9 +179,10 @@ const CreatorPage = () => {
           </div>
 
           <Tabs value={tab} onValueChange={setTab} className="w-full">
-            <TabsList className="grid grid-cols-2 w-full">
-              <TabsTrigger value="create">Créer un resto</TabsTrigger>
-              <TabsTrigger value="list">Restaurants & critères</TabsTrigger>
+            <TabsList className="grid grid-cols-3 w-full">
+              <TabsTrigger value="create">Créer</TabsTrigger>
+              <TabsTrigger value="list">Restaurants</TabsTrigger>
+              <TabsTrigger value="categorize">Catégoriser</TabsTrigger>
             </TabsList>
 
             {/* ---------- CREATE TAB ---------- */}
@@ -339,6 +341,11 @@ const CreatorPage = () => {
                 ))}
               </div>
             </TabsContent>
+
+            {/* ---------- CATEGORIZE TAB ---------- */}
+            <TabsContent value="categorize" className="mt-4 space-y-4">
+              <CategorizeSection localRestaurants={localRestaurants} dbRestaurants={dbRestaurants} onNeedLoad={loadRestaurants} />
+            </TabsContent>
           </Tabs>
         </motion.div>
       </div>
@@ -410,5 +417,105 @@ const RestoCard = ({
     </div>
   </div>
 );
+
+type MiniResto = { id: string; name: string };
+
+const CategorizeSection = ({
+  localRestaurants, dbRestaurants, onNeedLoad,
+}: {
+  localRestaurants: { id: string; name: string }[];
+  dbRestaurants: { id: string; name: string }[];
+  onNeedLoad: () => void;
+}) => {
+  useEffect(() => { if (!dbRestaurants.length) onNeedLoad(); /* eslint-disable-next-line */ }, []);
+
+  const all: MiniResto[] = useMemo(
+    () => [...localRestaurants.map(r => ({ id: r.id, name: r.name })), ...dbRestaurants.map(r => ({ id: r.id, name: r.name }))],
+    [localRestaurants, dbRestaurants]
+  );
+
+  const [selectedId, setSelectedId] = useState<string>(all[0]?.id ?? "");
+  const [cat, setCat] = useState<Record<string, string>>({});
+
+  useEffect(() => {
+    if (!selectedId) return;
+    const stored = loadCategorizations();
+    setCat(stored[selectedId] ?? {});
+  }, [selectedId]);
+
+  const setAnswer = (qid: string, val: string) => setCat((c) => ({ ...c, [qid]: val }));
+
+  const save = () => {
+    if (!selectedId) return;
+    saveCategorization(selectedId, cat);
+    toast.success("Catégorisation enregistrée");
+  };
+
+  return (
+    <div className="space-y-4">
+      <div className="p-3 rounded-xl bg-muted/40 border border-border text-xs font-body text-muted-foreground leading-relaxed">
+        Sélectionne un restaurant, puis choisis <b>une seule réponse par question</b>. Ces catégorisations alimentent le moteur de recommandation du quiz.
+      </div>
+
+      <Field label="Restaurant à catégoriser">
+        <select value={selectedId} onChange={(e) => setSelectedId(e.target.value)} className={inputCls}>
+          {all.map(r => <option key={r.id} value={r.id}>{r.name}</option>)}
+        </select>
+      </Field>
+
+      <div className="space-y-4">
+        {QUESTIONS.map((q) => {
+          let opts = q.options;
+          if (q.conditional) {
+            const parent = cat[q.conditional.dependsOn];
+            if (!parent || q.conditional.skipIf?.includes(parent)) {
+              return (
+                <div key={q.id} className="p-3 rounded-xl border border-dashed border-border bg-muted/20">
+                  <div className="text-xs font-semibold font-heading text-muted-foreground">{q.id.toUpperCase()} · {q.title}</div>
+                  <p className="text-[11px] font-body text-muted-foreground mt-1 italic">
+                    {parent ? "Non applicable" : "Réponds d'abord à Q3"}
+                  </p>
+                </div>
+              );
+            }
+            opts = q.conditional.optionsMap[parent] ?? [];
+          }
+
+          const selected = cat[q.id];
+          return (
+            <div key={q.id} className="p-3 rounded-xl border border-border bg-card space-y-2">
+              <div className="text-xs font-semibold font-heading text-foreground">
+                {q.id.toUpperCase()} · {q.title}
+              </div>
+              <div className="flex flex-wrap gap-1.5">
+                {opts.map((o) => (
+                  <button
+                    key={o}
+                    type="button"
+                    onClick={() => setAnswer(q.id, o)}
+                    className={`px-2.5 py-1 rounded-full text-[11px] font-body border transition-colors ${
+                      selected === o
+                        ? "bg-accent text-accent-foreground border-accent shadow"
+                        : "bg-background text-muted-foreground border-border hover:border-accent/50"
+                    }`}
+                  >
+                    {o}
+                  </button>
+                ))}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      <button
+        onClick={save}
+        className="w-full py-3 rounded-full bg-accent text-accent-foreground font-heading font-semibold shadow-lg flex items-center justify-center gap-2"
+      >
+        <Check className="w-4 h-4" /> Enregistrer la catégorisation
+      </button>
+    </div>
+  );
+};
 
 export default CreatorPage;
