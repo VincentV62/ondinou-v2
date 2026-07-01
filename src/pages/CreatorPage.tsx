@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft, Check, Star, Trash2, Users, Utensils } from "lucide-react";
@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { restaurants as localRestaurants } from "@/data/restaurants";
+import { QUESTIONS, loadCategorizations, saveCategorization } from "@/data/quiz";
 
 const FOOD_TYPES = ["Italien", "Japonais", "Poisson", "Viande", "Asiatique", "Estaminet", "Bistronomie", "Végétarien"];
 const AMBIANCES = ["Cosy", "Branché", "Romantique", "Entre potes"];
