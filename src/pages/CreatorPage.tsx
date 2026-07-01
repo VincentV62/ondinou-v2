@@ -179,9 +179,10 @@ const CreatorPage = () => {
           </div>
 
           <Tabs value={tab} onValueChange={setTab} className="w-full">
-            <TabsList className="grid grid-cols-2 w-full">
-              <TabsTrigger value="create">Créer un resto</TabsTrigger>
-              <TabsTrigger value="list">Restaurants & critères</TabsTrigger>
+            <TabsList className="grid grid-cols-3 w-full">
+              <TabsTrigger value="create">Créer</TabsTrigger>
+              <TabsTrigger value="list">Restaurants</TabsTrigger>
+              <TabsTrigger value="categorize">Catégoriser</TabsTrigger>
             </TabsList>
 
             {/* ---------- CREATE TAB ---------- */}
