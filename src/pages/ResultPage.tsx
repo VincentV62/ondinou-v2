@@ -10,27 +10,35 @@ const ResultPage = () => {
   const navigate = useNavigate();
   const [index, setIndex] = useState(0);
   const [showChangeMsg, setShowChangeMsg] = useState(false);
+  const [showAllMap, setShowAllMap] = useState(false);
 
-  const handleChangeRestaurant = useCallback(() => {
-    setShowChangeMsg(true);
-    setTimeout(() => {
-      navigate("/quiz?step=3");
-    }, 1800);
-  }, [navigate]);
-
-
+  const mode = (typeof window !== "undefined" ? sessionStorage.getItem("quizMode") : "") || "hungry";
 
   const results = useMemo(() => {
     try {
       const raw = sessionStorage.getItem("quizAnswers");
       if (!raw) return [];
       const answers: QuizAnswers = JSON.parse(raw);
-      // Use local matching engine (works with mock data)
-      return matchRestaurants(answers);
+      return matchRestaurants(answers).filter((r: any) => r.score > 0);
     } catch {
       return [];
     }
   }, []);
+
+  const handleAnotherSuggestion = useCallback(() => {
+    if (index + 1 < results.length) {
+      setIndex(index + 1);
+      setShowChangeMsg(true);
+      setTimeout(() => setShowChangeMsg(false), 1500);
+    } else if (mode === "full") {
+      setShowAllMap(true);
+    } else {
+      setShowChangeMsg(true);
+      setTimeout(() => navigate("/quiz"), 1500);
+    }
+  }, [index, results.length, mode, navigate]);
+
+  const handleChangeRestaurant = handleAnotherSuggestion;
 
   if (!results.length) {
     return (
@@ -42,6 +50,33 @@ const ResultPage = () => {
       </div>
     );
   }
+
+  if (showAllMap) {
+    return (
+      <div className="min-h-screen bg-background px-6 py-6">
+        <img src={dinouLogo} alt="Dinou" className="w-20 h-20 mx-auto object-contain animate-float cursor-pointer" onClick={() => navigate("/")} />
+        <h2 className="text-lg font-heading font-semibold text-center mt-4 text-foreground">Voici tous les restos qui te correspondent 🗺️</h2>
+        <div className="mt-4 space-y-3 max-w-md mx-auto">
+          {results.map((r) => (
+            <div key={r.id} className="glass-card rounded-xl overflow-hidden flex gap-3">
+              <img src={r.photo} alt={r.name} className="w-20 h-20 object-cover" />
+              <div className="p-2 flex-1">
+                <p className="font-heading font-semibold text-sm text-foreground">{r.name}</p>
+                <p className="text-xs text-muted-foreground font-body">{r.cuisine} · ⭐ {r.rating}</p>
+                <p className="text-xs text-muted-foreground font-body">{r.address}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+        <div className="max-w-sm mx-auto mt-6">
+          <button onClick={() => navigate("/quiz")} className="w-full py-3 rounded-full bg-accent text-accent-foreground font-heading font-semibold">
+            Recommencer le quiz
+          </button>
+        </div>
+      </div>
+    );
+  }
+
 
   const restaurant: Restaurant = results[index];
 
