@@ -188,7 +188,31 @@ export const QUESTIONS: Question[] = [
     type: "single",
     options: ["Accessibilité PMR", "Tickets restaurant acceptés", "Je veux pouvoir réserver ce soir", "Rien à ajouter"],
   },
+  {
+    id: "q_allergies",
+    title: "Quelles allergies ?",
+    type: "multi",
+    options: [
+      "Gluten",
+      "Crustacés",
+      "Œufs",
+      "Poisson",
+      "Cacahuètes / arachides",
+      "Soja",
+      "Lait",
+      "Noix / Fruits à coque",
+      "Céleri",
+      "Moutarde",
+      "Graines de sésame",
+      "Dioxyde de soufre et sulfites",
+      "Lupin",
+      "Mollusques",
+    ],
+  },
 ];
+
+export const ALLERGY_TRIGGER = "Intolérance ou allergie";
+
 
 export const CORE_IDS = ["q1", "q2", "q3", "q4", "q5", "q6", "q7"];
 export const OPTIONAL_IDS = ["q8", "q9", "q10", "q11", "q12", "q13", "q14", "q15", "q16", "q17"];
