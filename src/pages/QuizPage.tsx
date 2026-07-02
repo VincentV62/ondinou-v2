@@ -92,18 +92,32 @@ const QuizPage = () => {
   const finishStep = useCallback((update: Record<string, string>) => {
     const merged = { ...answers, ...update };
     setAnswers(merged);
-    if (step >= order.length - 1) {
+    setMultiSel({});
+    // Inject allergies question right after q10 if triggered
+    let nextOrder = order;
+    if (currentId === "q10" && update["q10"] === ALLERGY_TRIGGER && !order.includes("q_allergies")) {
+      nextOrder = [...order.slice(0, step + 1), "q_allergies", ...order.slice(step + 1)];
+      setOrder(nextOrder);
+      sessionStorage.setItem("quizOrder", JSON.stringify(nextOrder));
+    }
+    if (step >= nextOrder.length - 1) {
       sessionStorage.setItem("quizAnswers", JSON.stringify(merged));
       navigate("/result");
     } else {
       setDir(1);
       setStep(step + 1);
     }
-  }, [answers, step, order.length, navigate]);
+  }, [answers, step, order, currentId, navigate]);
 
   const selectOption = (val: string) => {
     finishStep({ [currentId]: val });
   };
+
+  const confirmMulti = () => {
+    const chosen = Object.entries(multiSel).filter(([, v]) => v).map(([k]) => k);
+    finishStep({ [currentId]: chosen.join(", ") || "Aucune" });
+  };
+
 
   const confirmGuests = () => {
     if (!guests) return;
