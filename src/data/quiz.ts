@@ -18,9 +18,10 @@ export interface Question {
 export const QUESTIONS: Question[] = [
   {
     id: "q1",
-    title: "Pour quand est ce repas ?",
+    title: "Quand veux-tu aller manger ?",
     type: "date",
     options: ["Aujourd'hui", "Demain", "Ce week-end", "Dans la semaine", "Choisir une date précise"],
+
   },
   {
     id: "q2",
