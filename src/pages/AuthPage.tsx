@@ -35,7 +35,7 @@ const AuthPage = () => {
     } else {
       const { error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) setError(error.message);
-      else navigate("/reservation");
+      else navigate("/quiz");
     }
     setLoading(false);
   };
@@ -43,7 +43,7 @@ const AuthPage = () => {
   const handleGoogleAuth = async () => {
     await supabase.auth.signInWithOAuth({
       provider: "google",
-      options: { redirectTo: window.location.origin + "/reservation" },
+      options: { redirectTo: window.location.origin + "/quiz" },
     });
   };
 
@@ -189,7 +189,7 @@ const AuthPage = () => {
       </button>
 
       <button
-        onClick={() => navigate("/reservation")}
+        onClick={() => navigate("/quiz")}
         className="mt-3 text-xs text-muted-foreground font-body"
       >
         Continuer sans compte →
