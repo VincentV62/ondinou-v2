@@ -29,6 +29,8 @@ const QuizPage = () => {
   const [customDate, setCustomDate] = useState("");
   const [guests, setGuests] = useState<string>("");
   const [needs, setNeeds] = useState<Record<string, boolean>>({});
+  const [multiSel, setMultiSel] = useState<Record<string, boolean>>({});
+
 
   useEffect(() => {
     const geoGranted = sessionStorage.getItem("geoGranted");
