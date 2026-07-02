@@ -290,6 +290,25 @@ const QuizPage = () => {
                 ))}
               </div>
             )}
+
+            {question.type === "multi" && (
+              <div className="max-w-xs mx-auto space-y-2">
+                <div className="grid grid-cols-2 gap-2">
+                  {question.options.map((option) => (
+                    <label key={option} className={`flex items-center gap-2 px-3 py-2 rounded-xl border cursor-pointer transition-colors ${multiSel[option] ? "bg-accent text-accent-foreground border-accent" : "bg-card text-card-foreground border-border hover:border-accent/50"}`}>
+                      <input type="checkbox" checked={!!multiSel[option]} onChange={(e) => setMultiSel({ ...multiSel, [option]: e.target.checked })}
+                        className="h-4 w-4 rounded border-border accent-[hsl(var(--accent))]" />
+                      <span className="font-body text-xs">{option}</span>
+                    </label>
+                  ))}
+                </div>
+                <button onClick={confirmMulti}
+                  className="w-full mt-4 py-3 rounded-full bg-accent text-accent-foreground font-heading font-semibold text-lg shadow-lg">
+                  Continuer
+                </button>
+              </div>
+            )}
+
           </motion.div>
         </AnimatePresence>
 
