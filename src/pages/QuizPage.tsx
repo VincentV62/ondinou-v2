@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { ChevronLeft, ChevronRight, MapPin } from "lucide-react";
 import dinouLogo from "@/assets/dinou-logo.png";
-import { QUESTIONS, buildQuestionOrder, getQuestion, type QuizMode } from "@/data/quiz";
+import { QUESTIONS, buildQuestionOrder, getQuestion, ALLERGY_TRIGGER, type QuizMode } from "@/data/quiz";
 
 const MODE_META: { id: QuizMode; title: string; desc: string; emoji: string }[] = [
   { id: "hungry", title: "J'ai faim", desc: "7 questions rapides pour trouver ton spot", emoji: "🍽️" },
