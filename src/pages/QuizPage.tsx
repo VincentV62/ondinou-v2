@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { ChevronLeft, ChevronRight, MapPin } from "lucide-react";
 import dinouLogo from "@/assets/dinou-logo.png";
-import { QUESTIONS, buildQuestionOrder, getQuestion, type QuizMode } from "@/data/quiz";
+import { QUESTIONS, buildQuestionOrder, getQuestion, ALLERGY_TRIGGER, type QuizMode } from "@/data/quiz";
 
 const MODE_META: { id: QuizMode; title: string; desc: string; emoji: string }[] = [
   { id: "hungry", title: "J'ai faim", desc: "7 questions rapides pour trouver ton spot", emoji: "🍽️" },
@@ -29,6 +29,8 @@ const QuizPage = () => {
   const [customDate, setCustomDate] = useState("");
   const [guests, setGuests] = useState<string>("");
   const [needs, setNeeds] = useState<Record<string, boolean>>({});
+  const [multiSel, setMultiSel] = useState<Record<string, boolean>>({});
+
 
   useEffect(() => {
     const geoGranted = sessionStorage.getItem("geoGranted");
@@ -90,18 +92,32 @@ const QuizPage = () => {
   const finishStep = useCallback((update: Record<string, string>) => {
     const merged = { ...answers, ...update };
     setAnswers(merged);
-    if (step >= order.length - 1) {
+    setMultiSel({});
+    // Inject allergies question right after q10 if triggered
+    let nextOrder = order;
+    if (currentId === "q10" && update["q10"] === ALLERGY_TRIGGER && !order.includes("q_allergies")) {
+      nextOrder = [...order.slice(0, step + 1), "q_allergies", ...order.slice(step + 1)];
+      setOrder(nextOrder);
+      sessionStorage.setItem("quizOrder", JSON.stringify(nextOrder));
+    }
+    if (step >= nextOrder.length - 1) {
       sessionStorage.setItem("quizAnswers", JSON.stringify(merged));
       navigate("/result");
     } else {
       setDir(1);
       setStep(step + 1);
     }
-  }, [answers, step, order.length, navigate]);
+  }, [answers, step, order, currentId, navigate]);
 
   const selectOption = (val: string) => {
     finishStep({ [currentId]: val });
   };
+
+  const confirmMulti = () => {
+    const chosen = Object.entries(multiSel).filter(([, v]) => v).map(([k]) => k);
+    finishStep({ [currentId]: chosen.join(", ") || "Aucune" });
+  };
+
 
   const confirmGuests = () => {
     if (!guests) return;
@@ -274,6 +290,25 @@ const QuizPage = () => {
                 ))}
               </div>
             )}
+
+            {question.type === "multi" && (
+              <div className="max-w-xs mx-auto space-y-2">
+                <div className="grid grid-cols-2 gap-2">
+                  {question.options.map((option) => (
+                    <label key={option} className={`flex items-center gap-2 px-3 py-2 rounded-xl border cursor-pointer transition-colors ${multiSel[option] ? "bg-accent text-accent-foreground border-accent" : "bg-card text-card-foreground border-border hover:border-accent/50"}`}>
+                      <input type="checkbox" checked={!!multiSel[option]} onChange={(e) => setMultiSel({ ...multiSel, [option]: e.target.checked })}
+                        className="h-4 w-4 rounded border-border accent-[hsl(var(--accent))]" />
+                      <span className="font-body text-xs">{option}</span>
+                    </label>
+                  ))}
+                </div>
+                <button onClick={confirmMulti}
+                  className="w-full mt-4 py-3 rounded-full bg-accent text-accent-foreground font-heading font-semibold text-lg shadow-lg">
+                  Continuer
+                </button>
+              </div>
+            )}
+
           </motion.div>
         </AnimatePresence>
 

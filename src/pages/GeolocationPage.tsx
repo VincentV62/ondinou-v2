@@ -9,8 +9,8 @@ const GeolocationPage = () => {
 
   const handleAllow = () => {
     navigator.geolocation?.getCurrentPosition(
-      () => navigate("/reservation"),
-      () => navigate("/reservation")
+      () => navigate("/quiz"),
+      () => navigate("/quiz")
     );
   };
 
@@ -44,7 +44,7 @@ const GeolocationPage = () => {
           {t("geo_allow")}
         </motion.button>
         <motion.button
-          onClick={() => navigate("/reservation")}
+          onClick={() => navigate("/quiz")}
           className="px-6 py-3 rounded-full bg-muted text-muted-foreground font-heading font-semibold"
           whileTap={{ scale: 0.95 }}
           initial={{ opacity: 0 }}
