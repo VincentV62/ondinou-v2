@@ -5,14 +5,15 @@ export type QuizMode = "hungry" | "occasion" | "full";
 export interface Question {
   id: string;              // q1..q17
   title: string;
-  type: "single" | "guests" | "date";
-  options: string[];       // for "single"
+  type: "single" | "multi" | "guests" | "date";
+  options: string[];       // for "single" / "multi"
   conditional?: {          // Q4 depends on Q3
     dependsOn: string;
     optionsMap: Record<string, string[]>;
     skipIf?: string[];     // Q3 values that skip Q4
   };
 }
+
 
 export const QUESTIONS: Question[] = [
   {
