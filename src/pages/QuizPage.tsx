@@ -217,7 +217,7 @@ const QuizPage = () => {
     return (
       <div className="flex flex-col min-h-screen bg-background px-6 py-6">
         <div className="flex flex-col items-center">
-          <img src={dinouLogo} alt="Dinou" className="w-32 h-32 md:w-40 md:h-40 object-contain animate-float cursor-pointer" onClick={() => navigate("/")} />
+          <img src={dinouLogo} alt="Dinou" className="w-32 h-32 md:w-40 md:h-40 object-contain animate-float cursor-pointer" onClick={() => navigate("/auth")} />
           <div className="glass-card rounded-2xl px-6 py-4 mt-3 max-w-md">
             <p className="text-foreground text-center font-body text-base md:text-lg">
               Comment veux-tu qu'on trouve ton resto aujourd'hui ? 😋
@@ -262,7 +262,7 @@ const QuizPage = () => {
   return (
     <div className="flex flex-col min-h-screen bg-background px-6 py-6 overflow-hidden">
       <div className="flex flex-col items-center">
-        <img src={dinouLogo} alt="Dinou" className="w-28 h-28 md:w-32 md:h-32 object-contain animate-float cursor-pointer" onClick={() => navigate("/")} />
+        <img src={dinouLogo} alt="Dinou" className="w-28 h-28 md:w-32 md:h-32 object-contain animate-float cursor-pointer" onClick={() => navigate("/auth")} />
       </div>
 
       <div className="flex-1 flex items-center justify-center relative">
