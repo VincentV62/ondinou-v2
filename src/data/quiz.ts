@@ -230,6 +230,60 @@ export const QUESTIONS: Question[] = [
     ],
   },
   {
+    id: "q18",
+    title: "Un restaurant récemment ouvert ou une adresse établie ?",
+    type: "single",
+    options: [
+      "Récemment ouvert - je veux découvrir les nouvelles adresses",
+      "Installé depuis plusieurs années et reconnu",
+      "Un an ou 2 d'existence, une pépite confirmée",
+      "Peu importe",
+    ],
+  },
+  {
+    id: "q19",
+    title: "Une reconnaissance ou un label ?",
+    type: "single",
+    options: [
+      "Guide Michelin ou Bib Gourmand",
+      "Note Google supérieure à 4,5",
+      "Un chef de l'association Lille Tables & Toques",
+      "Peu importe",
+    ],
+  },
+  {
+    id: "q20",
+    title: "Le cadre et la décoration du lieu...",
+    type: "single",
+    options: [
+      "Doivent être très à la mode",
+      "Un endroit original c'est sympa",
+      "Un endroit sobre et élégant",
+      "Peu importe, seule l'assiette compte",
+    ],
+  },
+  {
+    id: "q21",
+    title: "Le cadre a-t-il quelque chose de particulier ?",
+    type: "single",
+    options: [
+      "Vue sur jardin ou cour intérieure",
+      "Lieu historique, bâtiment classé ou atypique",
+      "Terrasse avec vue dégagée ou rooftop",
+      "Cave voûtée ou espace souterrain",
+      "Aucun cadre particulier",
+    ],
+  },
+  {
+    id: "q22",
+    title: "Puis-je venir avec un animal ?",
+    type: "single",
+    options: [
+      "Oui, partout dans le restaurant",
+      "Peu importe, je n'ai pas d'animaux",
+    ],
+  },
+  {
     id: "q_allergies",
     title: "Quelles allergies ?",
     type: "multi",
@@ -256,7 +310,7 @@ export const ALLERGY_TRIGGER = "Intolérance ou allergie";
 
 
 export const CORE_IDS = ["q1", "q2", "q3", "q4", "q5", "q6", "q7"];
-export const OPTIONAL_IDS = ["q8", "q9", "q10", "q11", "q12", "q13", "q14", "q15", "q16", "q17"];
+export const OPTIONAL_IDS = ["q8", "q9", "q10", "q11", "q12", "q13", "q14", "q15", "q16", "q17", "q18", "q19", "q20", "q21", "q22"];
 
 export function getQuestion(id: string): Question | undefined {
   return QUESTIONS.find((q) => q.id === id);
