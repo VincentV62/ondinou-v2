@@ -3,7 +3,7 @@
 export type QuizMode = "hungry" | "occasion" | "full";
 
 export interface Question {
-  id: string;              // q1..q17
+  id: string;              // q1..q22
   title: string;
   type: "single" | "multi" | "guests" | "date";
   options: string[];       // for "single" / "multi"
