@@ -290,23 +290,42 @@ const QuizPage = () => {
             {question.type === "date" && (
               <div className="space-y-3 max-w-xs mx-auto">
                 {question.options.slice(0, -1).map((o) => (
-                  <button key={o} onClick={() => selectOption(o)}
-                    className="w-full px-4 py-3 rounded-xl text-left font-body bg-card text-card-foreground border border-border hover:border-accent/50">
+                  <button
+                    key={o}
+                    onClick={() => { setSelectedDateLabel(o); setCustomDate(""); }}
+                    className={`w-full px-4 py-3 rounded-xl text-left font-body border transition-colors ${selectedDateLabel === o ? "bg-accent text-accent-foreground border-accent" : "bg-card text-card-foreground border-border hover:border-accent/50"}`}
+                  >
                     {o}
                   </button>
                 ))}
                 <div className="p-3 rounded-xl border border-border bg-card space-y-2">
-                  <label className="text-xs font-body text-muted-foreground">Choisir une date précise</label>
-                  <input type="date" value={customDate} onChange={(e) => setCustomDate(e.target.value)}
-                    className="w-full px-3 py-2 rounded-lg bg-background border border-border font-body text-sm" />
-                  {customDate && (
-                    <button onClick={confirmDate} className="w-full py-2 rounded-full bg-accent text-accent-foreground font-heading font-semibold text-sm">
-                      Valider
-                    </button>
-                  )}
+                  <label className="text-xs font-body text-muted-foreground">Ou choisir une date précise</label>
+                  <input
+                    type="date"
+                    value={customDate}
+                    onChange={(e) => { setCustomDate(e.target.value); setSelectedDateLabel(""); }}
+                    className="w-full px-3 py-2 rounded-lg bg-background border border-border font-body text-sm"
+                  />
                 </div>
+                <div className="p-3 rounded-xl border border-border bg-card space-y-2">
+                  <label className="text-xs font-body text-muted-foreground">Quelle heure ?</label>
+                  <input
+                    type="time"
+                    value={customTime}
+                    onChange={(e) => setCustomTime(e.target.value)}
+                    className="w-full px-3 py-2 rounded-lg bg-background border border-border font-body text-sm"
+                  />
+                </div>
+                <button
+                  onClick={confirmDate}
+                  disabled={(!customDate && !selectedDateLabel) || !customTime}
+                  className="w-full py-3 rounded-full bg-accent text-accent-foreground font-heading font-semibold shadow-md disabled:opacity-50"
+                >
+                  Continuer
+                </button>
               </div>
             )}
+
 
             {question.type === "guests" && (
               <div className="max-w-xs mx-auto space-y-4">
