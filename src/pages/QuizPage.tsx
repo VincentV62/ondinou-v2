@@ -25,18 +25,17 @@ const QuizPage = () => {
   const [dir, setDir] = useState(1);
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [showGeoPrompt, setShowGeoPrompt] = useState(false);
-  const [geoResolved, setGeoResolved] = useState(false);
+  const [pendingAfterGeo, setPendingAfterGeo] = useState<Record<string, string> | null>(null);
   const [customDate, setCustomDate] = useState("");
+  const [customTime, setCustomTime] = useState("");
+  const [selectedDateLabel, setSelectedDateLabel] = useState<string>("");
   const [guests, setGuests] = useState<string>("");
   const [needs, setNeeds] = useState<Record<string, boolean>>({});
   const [multiSel, setMultiSel] = useState<Record<string, boolean>>({});
-
-
-  useEffect(() => {
-    const geoGranted = sessionStorage.getItem("geoGranted");
-    if (geoGranted) setGeoResolved(true);
-    else setShowGeoPrompt(true);
-  }, []);
+  const [showSignup, setShowSignup] = useState(false);
+  const [finalAnswers, setFinalAnswers] = useState<Record<string, string> | null>(null);
+  const [signupName, setSignupName] = useState("");
+  const [signupEmail, setSignupEmail] = useState("");
 
   const handleGeoAllow = () => {
     navigator.geolocation?.getCurrentPosition(
@@ -44,17 +43,20 @@ const QuizPage = () => {
         sessionStorage.setItem("userLat", String(pos.coords.latitude));
         sessionStorage.setItem("userLng", String(pos.coords.longitude));
         sessionStorage.setItem("geoGranted", "true");
-        setShowGeoPrompt(false); setGeoResolved(true);
+        setShowGeoPrompt(false);
+        if (pendingAfterGeo) { finishStepInternal(pendingAfterGeo); setPendingAfterGeo(null); }
       },
       () => {
         sessionStorage.setItem("geoGranted", "denied");
-        setShowGeoPrompt(false); setGeoResolved(true);
+        setShowGeoPrompt(false);
+        if (pendingAfterGeo) { finishStepInternal(pendingAfterGeo); setPendingAfterGeo(null); }
       }
     );
   };
   const handleGeoDeny = () => {
     sessionStorage.setItem("geoGranted", "denied");
-    setShowGeoPrompt(false); setGeoResolved(true);
+    setShowGeoPrompt(false);
+    if (pendingAfterGeo) { finishStepInternal(pendingAfterGeo); setPendingAfterGeo(null); }
   };
 
   const chooseMode = (m: QuizMode) => {
@@ -70,30 +72,26 @@ const QuizPage = () => {
   const currentId = order[step];
   const question = useMemo(() => (currentId ? getQuestion(currentId) : undefined), [currentId]);
 
-  // Q4 conditional options
   const conditionalOptions = useMemo(() => {
     if (!question?.conditional) return null;
     const parent = answers[question.conditional.dependsOn];
     if (!parent) return [];
-    if (question.conditional.skipIf?.includes(parent)) return null; // skip
+    if (question.conditional.skipIf?.includes(parent)) return null;
     return question.conditional.optionsMap[parent] ?? [];
   }, [question, answers]);
 
-  // Auto-skip Q4 if Q3 = "Peu importe"
   useEffect(() => {
     if (question?.conditional && conditionalOptions === null && step < order.length) {
-      // move forward automatically
       const t = setTimeout(() => finishStep({}), 0);
       return () => clearTimeout(t);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [question, conditionalOptions]);
 
-  const finishStep = useCallback((update: Record<string, string>) => {
+  const finishStepInternal = useCallback((update: Record<string, string>) => {
     const merged = { ...answers, ...update };
     setAnswers(merged);
     setMultiSel({});
-    // Inject allergies question right after q10 if triggered
     let nextOrder = order;
     if (currentId === "q10" && update["q10"] === ALLERGY_TRIGGER && !order.includes("q_allergies")) {
       nextOrder = [...order.slice(0, step + 1), "q_allergies", ...order.slice(step + 1)];
@@ -102,12 +100,24 @@ const QuizPage = () => {
     }
     if (step >= nextOrder.length - 1) {
       sessionStorage.setItem("quizAnswers", JSON.stringify(merged));
-      navigate("/result");
+      setFinalAnswers(merged);
+      setShowSignup(true);
     } else {
       setDir(1);
       setStep(step + 1);
     }
-  }, [answers, step, order, currentId, navigate]);
+  }, [answers, step, order, currentId]);
+
+  const finishStep = useCallback((update: Record<string, string>) => {
+    // Trigger geo prompt after Q6 answer
+    if (currentId === "q6" && !sessionStorage.getItem("geoGranted")) {
+      setAnswers((a) => ({ ...a, ...update }));
+      setPendingAfterGeo(update);
+      setShowGeoPrompt(true);
+      return;
+    }
+    finishStepInternal(update);
+  }, [currentId, finishStepInternal]);
 
   const selectOption = (val: string) => {
     finishStep({ [currentId]: val });
@@ -127,15 +137,24 @@ const QuizPage = () => {
   };
 
   const confirmDate = () => {
-    if (!answers[currentId] && !customDate) return;
-    if (customDate) finishStep({ [currentId]: customDate });
+    if (!customTime) return;
+    const dateLabel = customDate || selectedDateLabel;
+    if (!dateLabel) return;
+    finishStep({ [currentId]: `${dateLabel} à ${customTime}` });
+  };
+
+  const submitSignup = () => {
+    if (!signupName.trim() || !signupEmail.trim()) return;
+    sessionStorage.setItem("userFirstName", signupName.trim());
+    sessionStorage.setItem("userEmail", signupEmail.trim());
+    navigate("/result");
   };
 
   const goBack = () => {
     if (step > 0) { setDir(-1); setStep(step - 1); }
   };
 
-  // -------- Geo prompt --------
+  // -------- Geo prompt (after Q6) --------
   if (showGeoPrompt) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen bg-background px-6">
@@ -143,7 +162,7 @@ const QuizPage = () => {
         <motion.div className="mt-6 glass-card rounded-2xl p-6 max-w-sm text-center" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
           <MapPin className="w-8 h-8 text-accent mx-auto mb-4" />
           <p className="text-foreground font-body text-base leading-relaxed">
-            Pour te trouver les meilleurs restos autour de toi, j'ai besoin de ta localisation 📍
+            Pour te trouver des restos dans ce périmètre, j'ai besoin de ta localisation 📍
           </p>
         </motion.div>
         <div className="mt-8 flex gap-4">
@@ -153,14 +172,52 @@ const QuizPage = () => {
       </div>
     );
   }
-  if (!geoResolved) return null;
+
+  // -------- Signup gate before results --------
+  if (showSignup) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen bg-background px-6">
+        <motion.img src={dinouLogo} alt="Dinou" className="w-24 h-24 object-contain animate-float" initial={{ opacity: 0 }} animate={{ opacity: 1 }} />
+        <motion.div className="mt-6 w-full max-w-sm space-y-4" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
+          <h2 className="text-xl font-heading font-bold text-foreground text-center">
+            Avant de découvrir ta reco…
+          </h2>
+          <p className="text-sm font-body text-muted-foreground text-center">
+            Laisse-moi ton prénom et ton email pour accéder à tes résultats.
+          </p>
+          <input
+            type="text"
+            placeholder="Prénom"
+            value={signupName}
+            onChange={(e) => setSignupName(e.target.value)}
+            className="w-full px-4 py-3 rounded-xl bg-card text-card-foreground border border-border font-body focus:outline-none focus:ring-2 focus:ring-accent"
+          />
+          <input
+            type="email"
+            placeholder="Adresse email"
+            value={signupEmail}
+            onChange={(e) => setSignupEmail(e.target.value)}
+            className="w-full px-4 py-3 rounded-xl bg-card text-card-foreground border border-border font-body focus:outline-none focus:ring-2 focus:ring-accent"
+          />
+          <button
+            onClick={submitSignup}
+            disabled={!signupName.trim() || !signupEmail.trim()}
+            className="w-full py-3 rounded-full bg-accent text-accent-foreground font-heading font-semibold shadow-md disabled:opacity-50"
+          >
+            Voir mes résultats
+          </button>
+        </motion.div>
+      </div>
+    );
+  }
+
 
   // -------- Mode selection --------
   if (!mode) {
     return (
       <div className="flex flex-col min-h-screen bg-background px-6 py-6">
         <div className="flex flex-col items-center">
-          <img src={dinouLogo} alt="Dinou" className="w-32 h-32 md:w-40 md:h-40 object-contain animate-float cursor-pointer" onClick={() => navigate("/")} />
+          <img src={dinouLogo} alt="Dinou" className="w-32 h-32 md:w-40 md:h-40 object-contain animate-float cursor-pointer" onClick={() => navigate("/auth")} />
           <div className="glass-card rounded-2xl px-6 py-4 mt-3 max-w-md">
             <p className="text-foreground text-center font-body text-base md:text-lg">
               Comment veux-tu qu'on trouve ton resto aujourd'hui ? 😋
@@ -205,7 +262,7 @@ const QuizPage = () => {
   return (
     <div className="flex flex-col min-h-screen bg-background px-6 py-6 overflow-hidden">
       <div className="flex flex-col items-center">
-        <img src={dinouLogo} alt="Dinou" className="w-28 h-28 md:w-32 md:h-32 object-contain animate-float cursor-pointer" onClick={() => navigate("/")} />
+        <img src={dinouLogo} alt="Dinou" className="w-28 h-28 md:w-32 md:h-32 object-contain animate-float cursor-pointer" onClick={() => navigate("/auth")} />
       </div>
 
       <div className="flex-1 flex items-center justify-center relative">
@@ -233,23 +290,42 @@ const QuizPage = () => {
             {question.type === "date" && (
               <div className="space-y-3 max-w-xs mx-auto">
                 {question.options.slice(0, -1).map((o) => (
-                  <button key={o} onClick={() => selectOption(o)}
-                    className="w-full px-4 py-3 rounded-xl text-left font-body bg-card text-card-foreground border border-border hover:border-accent/50">
+                  <button
+                    key={o}
+                    onClick={() => { setSelectedDateLabel(o); setCustomDate(""); }}
+                    className={`w-full px-4 py-3 rounded-xl text-left font-body border transition-colors ${selectedDateLabel === o ? "bg-accent text-accent-foreground border-accent" : "bg-card text-card-foreground border-border hover:border-accent/50"}`}
+                  >
                     {o}
                   </button>
                 ))}
                 <div className="p-3 rounded-xl border border-border bg-card space-y-2">
-                  <label className="text-xs font-body text-muted-foreground">Choisir une date précise</label>
-                  <input type="date" value={customDate} onChange={(e) => setCustomDate(e.target.value)}
-                    className="w-full px-3 py-2 rounded-lg bg-background border border-border font-body text-sm" />
-                  {customDate && (
-                    <button onClick={confirmDate} className="w-full py-2 rounded-full bg-accent text-accent-foreground font-heading font-semibold text-sm">
-                      Valider
-                    </button>
-                  )}
+                  <label className="text-xs font-body text-muted-foreground">Ou choisir une date précise</label>
+                  <input
+                    type="date"
+                    value={customDate}
+                    onChange={(e) => { setCustomDate(e.target.value); setSelectedDateLabel(""); }}
+                    className="w-full px-3 py-2 rounded-lg bg-background border border-border font-body text-sm"
+                  />
                 </div>
+                <div className="p-3 rounded-xl border border-border bg-card space-y-2">
+                  <label className="text-xs font-body text-muted-foreground">Quelle heure ?</label>
+                  <input
+                    type="time"
+                    value={customTime}
+                    onChange={(e) => setCustomTime(e.target.value)}
+                    className="w-full px-3 py-2 rounded-lg bg-background border border-border font-body text-sm"
+                  />
+                </div>
+                <button
+                  onClick={confirmDate}
+                  disabled={(!customDate && !selectedDateLabel) || !customTime}
+                  className="w-full py-3 rounded-full bg-accent text-accent-foreground font-heading font-semibold shadow-md disabled:opacity-50"
+                >
+                  Continuer
+                </button>
               </div>
             )}
+
 
             {question.type === "guests" && (
               <div className="max-w-xs mx-auto space-y-4">
