@@ -284,6 +284,31 @@ export const QUESTIONS: Question[] = [
     ],
   },
   {
+    id: "q23",
+    title: "Qu'est-ce qui vous ferait plaisir à boire ?",
+    type: "single",
+    options: [
+      "Cocktails soignés / mixologie",
+      "Belle sélection de vins au verre",
+      "Bières artisanales ou régionales",
+      "Champagne ou pétillants pour fêter",
+      "Sans alcool - mocktails, jus frais élaborés",
+      "Peu importe, je viens pour manger",
+    ],
+  },
+  {
+    id: "q24",
+    title: "Quelle carte des vins vous correspond ?",
+    type: "single",
+    options: [
+      "Vins nature et biodynamiques",
+      "Carte classique soignée - Bourgogne, Bordeaux, Loire",
+      "Vins du monde - Italie, Espagne, Nouveau Monde",
+      "Belle sélection accessible au verre",
+      "Peu importe, je ne bois pas de vin",
+    ],
+  },
+  {
     id: "q_allergies",
     title: "Quelles allergies ?",
     type: "multi",
@@ -304,9 +329,28 @@ export const QUESTIONS: Question[] = [
       "Mollusques",
     ],
   },
+  {
+    id: "q_diets",
+    title: "Quels régimes sont présents à table ?",
+    type: "multi",
+    options: [
+      "Végétarien - pas de viande ni de poisson",
+      "Vegan - aucun produit d'origine animale",
+      "Halal",
+      "Casher",
+      "Sans gluten",
+      "Sans lactose",
+      "Pescatarien - poisson accepté, pas de viande",
+      "Sans porc",
+      "Flexitarien - viande très occasionnelle",
+      "Sans fruits à coque / noix",
+    ],
+  },
 ];
 
 export const ALLERGY_TRIGGER = "Intolérance ou allergie";
+export const DIETS_TRIGGER = "Plusieurs régimes différents à la même table";
+
 
 
 export const CORE_IDS = ["q1", "q2", "q3", "q4", "q5", "q6", "q7"];
