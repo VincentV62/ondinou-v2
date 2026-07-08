@@ -39,7 +39,7 @@ export const QUESTIONS: Question[] = [
       "Cuisine asiatique",
       "Viandes, grillades & plats généreux",
       "Poissons, fruits de mer & produits de la mer",
-      "Cuisine créative & tendance",
+      "Cuisine tendance ou végé",
       "Peu importe - Surprends-moi",
     ],
   },
