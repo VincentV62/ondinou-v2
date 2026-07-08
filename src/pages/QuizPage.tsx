@@ -93,8 +93,14 @@ const QuizPage = () => {
     setAnswers(merged);
     setMultiSel({});
     let nextOrder = order;
-    if (currentId === "q10" && update["q10"] === ALLERGY_TRIGGER && !order.includes("q_allergies")) {
-      nextOrder = [...order.slice(0, step + 1), "q_allergies", ...order.slice(step + 1)];
+    const q10Val = update["q10"];
+    if (currentId === "q10" && q10Val?.startsWith(ALLERGY_TRIGGER) && !order.includes("q_allergies")) {
+      nextOrder = [...nextOrder.slice(0, step + 1), "q_allergies", ...nextOrder.slice(step + 1)];
+      setOrder(nextOrder);
+      sessionStorage.setItem("quizOrder", JSON.stringify(nextOrder));
+    }
+    if (currentId === "q10" && q10Val === DIETS_TRIGGER && !order.includes("q_diets")) {
+      nextOrder = [...nextOrder.slice(0, step + 1), "q_diets", ...nextOrder.slice(step + 1)];
       setOrder(nextOrder);
       sessionStorage.setItem("quizOrder", JSON.stringify(nextOrder));
     }
