@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { ChevronLeft, ChevronRight, MapPin } from "lucide-react";
 import dinouLogo from "@/assets/dinou-logo.png";
-import { QUESTIONS, buildQuestionOrder, getQuestion, ALLERGY_TRIGGER, type QuizMode } from "@/data/quiz";
+import { QUESTIONS, buildQuestionOrder, getQuestion, ALLERGY_TRIGGER, DIETS_TRIGGER, type QuizMode } from "@/data/quiz";
 
 const MODE_META: { id: QuizMode; title: string; desc: string; emoji: string }[] = [
   { id: "hungry", title: "J'ai faim", desc: "Une recommandation directe, tout de suite - 7 questions, environ 1 minute", emoji: "🍽️" },
@@ -93,8 +93,14 @@ const QuizPage = () => {
     setAnswers(merged);
     setMultiSel({});
     let nextOrder = order;
-    if (currentId === "q10" && update["q10"] === ALLERGY_TRIGGER && !order.includes("q_allergies")) {
-      nextOrder = [...order.slice(0, step + 1), "q_allergies", ...order.slice(step + 1)];
+    const q10Val = update["q10"];
+    if (currentId === "q10" && q10Val?.startsWith(ALLERGY_TRIGGER) && !order.includes("q_allergies")) {
+      nextOrder = [...nextOrder.slice(0, step + 1), "q_allergies", ...nextOrder.slice(step + 1)];
+      setOrder(nextOrder);
+      sessionStorage.setItem("quizOrder", JSON.stringify(nextOrder));
+    }
+    if (currentId === "q10" && q10Val === DIETS_TRIGGER && !order.includes("q_diets")) {
+      nextOrder = [...nextOrder.slice(0, step + 1), "q_diets", ...nextOrder.slice(step + 1)];
       setOrder(nextOrder);
       sessionStorage.setItem("quizOrder", JSON.stringify(nextOrder));
     }
