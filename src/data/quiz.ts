@@ -225,7 +225,7 @@ export const QUESTIONS: Question[] = [
     options: [
       "Accessibilité PMR - fauteuil, poussette",
       "Tickets restaurant acceptés",
-      "Je veux pouvoir réserver ce soir",
+      "Une clim' serait appréciée",
       "Rien à ajouter - je fais confiance à la recommandation",
     ],
   },
