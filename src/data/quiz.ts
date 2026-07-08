@@ -354,7 +354,7 @@ export const DIETS_TRIGGER = "Plusieurs régimes différents à la même table";
 
 
 export const CORE_IDS = ["q1", "q2", "q3", "q4", "q5", "q6", "q7"];
-export const OPTIONAL_IDS = ["q8", "q9", "q10", "q11", "q12", "q13", "q14", "q15", "q16", "q17", "q18", "q19", "q20", "q21", "q22"];
+export const OPTIONAL_IDS = ["q8", "q9", "q10", "q11", "q12", "q13", "q14", "q15", "q16", "q17", "q18", "q19", "q20", "q21", "q22", "q23", "q24"];
 
 export function getQuestion(id: string): Question | undefined {
   return QUESTIONS.find((q) => q.id === id);
