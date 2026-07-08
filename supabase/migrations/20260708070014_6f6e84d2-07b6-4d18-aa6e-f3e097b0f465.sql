@@ -1,0 +1,1 @@
+DELETE FROM public.restaurants WHERE name IN ('Bierbuik','Rouge Barre','Le Cerisier','Méert','Bloempot','Le Barbier qui Fume');
