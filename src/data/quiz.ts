@@ -92,7 +92,7 @@ export const QUESTIONS: Question[] = [
           "Cuisine nordique & maritime",
           "Peu importe",
         ],
-        "Cuisine créative & tendance": [
+        "Cuisine tendance ou végé": [
           "Bistronomique moderne & cuisine de saison",
           "Fusion & métissage culinaire",
           "Végétal & plant-based gastronomique",
