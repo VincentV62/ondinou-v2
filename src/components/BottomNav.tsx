@@ -19,7 +19,7 @@ const BottomNav = () => {
       </button>
 
       {/* Logo central */}
-      <button onClick={() => navigate("/auth")} className="flex items-center justify-center -mt-5" aria-label="Inscription">
+      <button onClick={() => navigate("/")} className="flex items-center justify-center -mt-5" aria-label="Accueil">
         <div className="w-14 h-14 rounded-full border-2 border-accent bg-primary flex items-center justify-center shadow-lg">
           <img src={dinouLogo} alt="Ondinou" className="w-10 h-10 object-contain" />
         </div>
