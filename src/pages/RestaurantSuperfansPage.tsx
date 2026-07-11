@@ -29,6 +29,19 @@ export default function RestaurantSuperfansPage() {
   const [partySize, setPartySize] = useState("2");
   const [selectedDate, setSelectedDate] = useState<Date>();
   const [selectedTime, setSelectedTime] = useState("20:00");
+  const [offer, setOffer] = useState("Pas d'offre");
+  const [customOffer, setCustomOffer] = useState("");
+
+  const OFFERS = [
+    "Pas d'offre",
+    "5% sur l'addition",
+    "10% sur l'addition",
+    "Café ou thé offert",
+    "Un verre d'accueil offert",
+    "Un digestif offert",
+    "Le dessert offert",
+    "Autre (précisez)",
+  ];
 
   const formattedDate = useMemo(() => {
     if (!selectedDate) return "Choisir une date";
