@@ -7,8 +7,8 @@ import { QUESTIONS, buildQuestionOrder, getQuestion, ALLERGY_TRIGGER, DIETS_TRIG
 
 const MODE_META: { id: QuizMode; title: string; desc: string; emoji: string }[] = [
   { id: "hungry", title: "J'ai faim", desc: "Une recommandation directe, tout de suite - 7 questions, environ 1 minute", emoji: "🍽️" },
-  { id: "occasion", title: "Occasion particulière", desc: "Des suggestions adaptées à ton moment - 12 questions, environ 3 minutes", emoji: "✨" },
   { id: "full", title: "Expérience ONDINOU", desc: "Le restaurant fait exactement pour toi - 15 questions, environ 5 minutes", emoji: "🌟" },
+  { id: "occasion", title: "Occasion particulière", desc: "Des suggestions adaptées à ton moment - 12 questions, environ 3 minutes", emoji: "✨" },
 ];
 
 const slideVariants = {
@@ -232,22 +232,45 @@ const QuizPage = () => {
         </div>
         <div className="flex-1 flex items-center justify-center py-8">
           <div className="w-full max-w-sm space-y-4">
-            {MODE_META.map((m) => (
-              <motion.button
-                key={m.id}
-                onClick={() => chooseMode(m.id)}
-                whileTap={{ scale: 0.97 }}
-                className="w-full p-5 rounded-2xl bg-card border border-border hover:border-accent text-left transition-colors shadow-sm"
-              >
-                <div className="flex items-center gap-3">
-                  <span className="text-3xl">{m.emoji}</span>
-                  <div>
-                    <div className="font-heading font-semibold text-foreground">{m.title}</div>
-                    <div className="text-xs font-body text-muted-foreground mt-0.5">{m.desc}</div>
+            {MODE_META.map((m) => {
+              const isFeatured = m.id === "full";
+              return (
+                <motion.button
+                  key={m.id}
+                  onClick={() => chooseMode(m.id)}
+                  whileTap={{ scale: 0.97 }}
+                  className={`relative w-full rounded-2xl bg-card text-left transition-colors shadow-sm ${
+                    isFeatured
+                      ? "p-[calc(1.25rem+4px)] border-2 hover:border-accent"
+                      : "p-5 border border-border hover:border-accent"
+                  }`}
+                  style={
+                    isFeatured
+                      ? {
+                          borderColor: "hsl(24, 54%, 53%)",
+                          animation: "ondinou-shimmer 2s ease-in-out infinite",
+                        }
+                      : undefined
+                  }
+                >
+                  {isFeatured && (
+                    <span
+                      className="absolute -top-2 right-3 px-2.5 py-0.5 rounded-full text-white font-body"
+                      style={{ backgroundColor: "hsl(24, 54%, 53%)", fontSize: "12px" }}
+                    >
+                      Notre choix
+                    </span>
+                  )}
+                  <div className="flex items-center gap-3">
+                    <span className="text-3xl">{m.emoji}</span>
+                    <div>
+                      <div className="font-heading font-semibold text-foreground">{m.title}</div>
+                      <div className="text-xs font-body text-muted-foreground mt-0.5">{m.desc}</div>
+                    </div>
                   </div>
-                </div>
-              </motion.button>
-            ))}
+                </motion.button>
+              );
+            })}
           </div>
         </div>
       </div>
