@@ -7,8 +7,8 @@ import { QUESTIONS, buildQuestionOrder, getQuestion, ALLERGY_TRIGGER, DIETS_TRIG
 
 const MODE_META: { id: QuizMode; title: string; desc: string; emoji: string }[] = [
   { id: "hungry", title: "J'ai faim", desc: "Une recommandation directe, tout de suite - 7 questions, environ 1 minute", emoji: "🍽️" },
-  { id: "occasion", title: "Occasion particulière", desc: "Des suggestions adaptées à ton moment - 12 questions, environ 3 minutes", emoji: "✨" },
   { id: "full", title: "Expérience ONDINOU", desc: "Le restaurant fait exactement pour toi - 15 questions, environ 5 minutes", emoji: "🌟" },
+  { id: "occasion", title: "Occasion particulière", desc: "Des suggestions adaptées à ton moment - 12 questions, environ 3 minutes", emoji: "✨" },
 ];
 
 const slideVariants = {
