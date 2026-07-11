@@ -141,6 +141,30 @@ export default function RestaurantSuperfansPage() {
                     <label className="text-sm font-medium text-foreground">Heure</label>
                     <Input type="time" value={selectedTime} onChange={(event) => setSelectedTime(event.target.value)} />
                   </div>
+
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-foreground">Avec</label>
+                    <div className="flex flex-col md:flex-row gap-2">
+                      <Select value={offer} onValueChange={setOffer}>
+                        <SelectTrigger className="md:flex-1">
+                          <SelectValue placeholder="Choisir une offre" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {OFFERS.map((value) => (
+                            <SelectItem key={value} value={value}>{value}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      {offer === "Autre (précisez)" && (
+                        <Input
+                          placeholder="Précisez votre offre"
+                          value={customOffer}
+                          onChange={(event) => setCustomOffer(event.target.value)}
+                          className="md:flex-1"
+                        />
+                      )}
+                    </div>
+                  </div>
                 </div>
 
                 <DialogFooter>
