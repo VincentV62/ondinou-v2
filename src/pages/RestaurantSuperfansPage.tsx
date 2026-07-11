@@ -29,6 +29,19 @@ export default function RestaurantSuperfansPage() {
   const [partySize, setPartySize] = useState("2");
   const [selectedDate, setSelectedDate] = useState<Date>();
   const [selectedTime, setSelectedTime] = useState("20:00");
+  const [offer, setOffer] = useState("Pas d'offre");
+  const [customOffer, setCustomOffer] = useState("");
+
+  const OFFERS = [
+    "Pas d'offre",
+    "5% sur l'addition",
+    "10% sur l'addition",
+    "Café ou thé offert",
+    "Un verre d'accueil offert",
+    "Un digestif offert",
+    "Le dessert offert",
+    "Autre (précisez)",
+  ];
 
   const formattedDate = useMemo(() => {
     if (!selectedDate) return "Choisir une date";
@@ -127,6 +140,30 @@ export default function RestaurantSuperfansPage() {
                   <div className="space-y-2">
                     <label className="text-sm font-medium text-foreground">Heure</label>
                     <Input type="time" value={selectedTime} onChange={(event) => setSelectedTime(event.target.value)} />
+                  </div>
+
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-foreground">Avec</label>
+                    <div className="flex flex-col md:flex-row gap-2">
+                      <Select value={offer} onValueChange={setOffer}>
+                        <SelectTrigger className="md:flex-1">
+                          <SelectValue placeholder="Choisir une offre" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {OFFERS.map((value) => (
+                            <SelectItem key={value} value={value}>{value}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      {offer === "Autre (précisez)" && (
+                        <Input
+                          placeholder="Précisez votre offre"
+                          value={customOffer}
+                          onChange={(event) => setCustomOffer(event.target.value)}
+                          className="md:flex-1"
+                        />
+                      )}
+                    </div>
                   </div>
                 </div>
 
