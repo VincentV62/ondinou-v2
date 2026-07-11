@@ -109,6 +109,6 @@
 }
 
 @keyframes ondinou-shimmer {
-  0%, 100% { box-shadow: 0 0 18px 3px hsla(24, 54%, 53%, 0.35); }
-  50% { box-shadow: 0 0 18px 3px hsla(24, 54%, 53%, 0.6); }
+  0%, 100% { box-shadow: 0 0 28px 6px hsla(24, 54%, 53%, 0.55); }
+  50% { box-shadow: 0 0 34px 8px hsla(24, 54%, 53%, 0.85); }
 }

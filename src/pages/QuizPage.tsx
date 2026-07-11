@@ -241,7 +241,7 @@ const QuizPage = () => {
                   whileTap={{ scale: 0.97 }}
                   className={`relative w-full rounded-2xl bg-card text-left transition-colors shadow-sm ${
                     isFeatured
-                      ? "p-[calc(1.25rem+4px)] border-2 hover:border-accent"
+                      ? "p-[calc(1.25rem+6px)] border-4 hover:border-accent"
                       : "p-5 border border-border hover:border-accent"
                   }`}
                   style={
