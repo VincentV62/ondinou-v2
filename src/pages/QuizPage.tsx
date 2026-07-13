@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { ChevronLeft, ChevronRight, MapPin } from "lucide-react";
 import dinouLogo from "@/assets/dinou-logo.png";
 import { QUESTIONS, buildQuestionOrder, getQuestion, ALLERGY_TRIGGER, DIETS_TRIGGER, type QuizMode } from "@/data/quiz";
+import { getCityCoords, geocodeCity } from "@/data/geo";
 
 const MODE_META: { id: QuizMode; title: string; desc: string; emoji: string }[] = [
   { id: "hungry", title: "J'ai faim", desc: "Une recommandation directe, tout de suite - 7 questions, environ 1 minute", emoji: "🍽️" },
