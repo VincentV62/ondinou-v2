@@ -5,7 +5,7 @@ export type QuizMode = "hungry" | "occasion" | "full";
 export interface Question {
   id: string;              // q1..q22
   title: string;
-  type: "single" | "multi" | "guests" | "date";
+  type: "single" | "multi" | "guests" | "date" | "location";
   options: string[];       // for "single" / "multi"
   conditional?: {          // Q4 depends on Q3
     dependsOn: string;
