@@ -32,6 +32,9 @@ const QuizPage = () => {
   const [guests, setGuests] = useState<string>("");
   const [needs, setNeeds] = useState<Record<string, boolean>>({});
   const [multiSel, setMultiSel] = useState<Record<string, boolean>>({});
+  const [locationMode, setLocationMode] = useState<"" | "around" | "city">("");
+  const [selectedCity, setSelectedCity] = useState<string>("");
+  const [customCity, setCustomCity] = useState<string>("");
   const [showSignup, setShowSignup] = useState(false);
   const [finalAnswers, setFinalAnswers] = useState<Record<string, string> | null>(null);
   const [signupName, setSignupName] = useState("");
