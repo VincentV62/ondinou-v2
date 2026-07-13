@@ -647,6 +647,7 @@ export function matchRestaurants(answers: QuizAnswers): Restaurant[] {
   const q4 = answers.q4;
   const q9 = answers.q9;
   const q11 = answers.q11;
+  const cityFilter = readCityFilter();
 
   return restaurants
     .map((r) => {
