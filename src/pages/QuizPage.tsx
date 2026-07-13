@@ -95,6 +95,9 @@ const QuizPage = () => {
     const merged = { ...answers, ...update };
     setAnswers(merged);
     setMultiSel({});
+    setLocationMode("");
+    setSelectedCity("");
+    setCustomCity("");
     let nextOrder = order;
     const q10Val = update["q10"];
     if (currentId === "q10" && q10Val?.startsWith(ALLERGY_TRIGGER) && !order.includes("q_allergies")) {
