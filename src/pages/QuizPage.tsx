@@ -36,6 +36,8 @@ const QuizPage = () => {
   const [locationMode, setLocationMode] = useState<"" | "around" | "city">("");
   const [selectedCity, setSelectedCity] = useState<string>("");
   const [customCity, setCustomCity] = useState<string>("");
+  const [cityError, setCityError] = useState<string>("");
+  const [geocoding, setGeocoding] = useState(false);
   const [showSignup, setShowSignup] = useState(false);
   const [finalAnswers, setFinalAnswers] = useState<Record<string, string> | null>(null);
   const [signupName, setSignupName] = useState("");
