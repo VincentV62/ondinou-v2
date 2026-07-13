@@ -602,12 +602,24 @@ export const restaurants: Restaurant[] = [
 export type QuizAnswers = Record<string, string>;
 
 import { loadCategorizations } from "./quiz";
+import { cityFromAddress, getCityCoords, haversineKm, type LatLng } from "./geo";
 
 // Weight per question when comparing user answer to resto categorization
 const QUESTION_WEIGHTS: Record<string, number> = {
   q3: 30, q4: 25, q7: 20, q9: 15, q8: 12, q11: 10, q14: 10,
   q10: 8, q12: 6, q13: 6, q15: 6, q16: 4, q17: 4, q1: 2, q2: 2, q5: 2,
 };
+
+// Maximum radius (km) around the reference city point to keep a restaurant.
+const CITY_FILTER_RADIUS_KM = 6;
+
+function readCityFilter(): LatLng | null {
+  if (typeof window === "undefined") return null;
+  const lat = parseFloat(sessionStorage.getItem("quizCityLat") || "");
+  const lng = parseFloat(sessionStorage.getItem("quizCityLng") || "");
+  if (Number.isNaN(lat) || Number.isNaN(lng)) return null;
+  return { lat, lng };
+}
 
 function budgetFromQ7(v?: string): number | null {
   if (!v) return null;
@@ -635,6 +647,7 @@ export function matchRestaurants(answers: QuizAnswers): Restaurant[] {
   const q4 = answers.q4;
   const q9 = answers.q9;
   const q11 = answers.q11;
+  const cityFilter = readCityFilter();
 
   return restaurants
     .map((r) => {
@@ -689,8 +702,20 @@ export function matchRestaurants(answers: QuizAnswers): Restaurant[] {
         else if (q11.startsWith("Intérieur") && !r.terrasse) score += 4;
       }
 
-      // Distance hard filter
+      // Distance hard filter (walking time from Q6)
       if (r.distanceMinutes > maxMin) score -= 50;
+
+      // City geographic filter (from q_location dropdown or "Autre" geocoding)
+      if (cityFilter) {
+        const restoCoords = getCityCoords(cityFromAddress(r.address));
+        if (!restoCoords) {
+          score -= 1000; // unknown city: exclude
+        } else if (haversineKm(cityFilter, restoCoords) > CITY_FILTER_RADIUS_KM) {
+          score -= 1000; // outside the requested city area: exclude
+        } else {
+          score += 5;
+        }
+      }
 
       return { ...r, score } as Restaurant & { score: number };
     })
