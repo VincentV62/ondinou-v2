@@ -417,6 +417,71 @@ const QuizPage = () => {
               </div>
             )}
 
+            {question.type === "location" && (
+              <div className="space-y-3 max-w-xs mx-auto">
+                <button
+                  onClick={() => {
+                    setLocationMode("");
+                    setSelectedCity("");
+                    setCustomCity("");
+                    finishStep({ [currentId]: "Autour de moi" });
+                  }}
+                  className={`w-full px-4 py-3 rounded-xl text-left font-body border transition-colors ${locationMode === "around" ? "bg-accent text-accent-foreground border-accent" : "bg-card text-card-foreground border-border hover:border-accent/50"}`}
+                >
+                  Autour de moi
+                </button>
+                <button
+                  onClick={() => setLocationMode("city")}
+                  className={`w-full px-4 py-3 rounded-xl text-left font-body border transition-colors ${locationMode === "city" ? "bg-accent text-accent-foreground border-accent" : "bg-card text-card-foreground border-border hover:border-accent/50"}`}
+                >
+                  Une ville en particulier
+                </button>
+                {locationMode === "city" && (
+                  <div className="p-3 rounded-xl border border-border bg-card space-y-2">
+                    <label className="text-xs font-body text-muted-foreground">Laquelle ?</label>
+                    <select
+                      value={selectedCity}
+                      onChange={(e) => {
+                        const v = e.target.value;
+                        setSelectedCity(v);
+                        if (v && v !== "Autre") {
+                          sessionStorage.setItem("quizCity", v);
+                          finishStep({ [currentId]: v });
+                        }
+                      }}
+                      className="w-full px-3 py-2 rounded-lg bg-background border border-border font-body text-sm"
+                    >
+                      <option value="" disabled>Choisir une ville…</option>
+                      {question.options.map((o) => <option key={o} value={o}>{o}</option>)}
+                    </select>
+                    {selectedCity === "Autre" && (
+                      <div className="space-y-2 pt-1">
+                        <input
+                          type="text"
+                          value={customCity}
+                          onChange={(e) => setCustomCity(e.target.value)}
+                          placeholder="Saisir une ville"
+                          className="w-full px-3 py-2 rounded-lg bg-background border border-border font-body text-sm"
+                        />
+                        <button
+                          onClick={() => {
+                            const v = customCity.trim();
+                            if (!v) return;
+                            sessionStorage.setItem("quizCity", v);
+                            finishStep({ [currentId]: v });
+                          }}
+                          disabled={!customCity.trim()}
+                          className="w-full py-2 rounded-full bg-accent text-accent-foreground font-heading font-semibold text-sm shadow-md disabled:opacity-50"
+                        >
+                          Valider
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
+
           </motion.div>
         </AnimatePresence>
 
