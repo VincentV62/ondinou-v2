@@ -5,7 +5,7 @@ export type QuizMode = "hungry" | "occasion" | "full";
 export interface Question {
   id: string;              // q1..q22
   title: string;
-  type: "single" | "multi" | "guests" | "date";
+  type: "single" | "multi" | "guests" | "date" | "location";
   options: string[];       // for "single" / "multi"
   conditional?: {          // Q4 depends on Q3
     dependsOn: string;
@@ -346,6 +346,25 @@ export const QUESTIONS: Question[] = [
       "Sans fruits à coque / noix",
     ],
   },
+  {
+    id: "q_location",
+    title: "Cherches-tu autour de toi ou dans une ville en particulier ?",
+    type: "location",
+    options: [
+      "Lille",
+      "Tourcoing",
+      "Roubaix",
+      "Villeneuve-d'Ascq",
+      "Wattrelos",
+      "Marcq-en-Barœul",
+      "Lambersart",
+      "Armentières",
+      "Loos",
+      "La Madeleine",
+      "Wasquehal",
+      "Autre",
+    ],
+  },
 ];
 
 export const ALLERGY_TRIGGER = "Intolérance ou allergie";
@@ -353,7 +372,7 @@ export const DIETS_TRIGGER = "Plusieurs régimes différents à la même table";
 
 
 
-export const CORE_IDS = ["q1", "q2", "q3", "q4", "q5", "q6", "q7"];
+export const CORE_IDS = ["q1", "q2", "q3", "q4", "q_location", "q5", "q6", "q7"];
 export const OPTIONAL_IDS = ["q8", "q9", "q10", "q11", "q12", "q13", "q14", "q15", "q16", "q17", "q18", "q19", "q20", "q21", "q22", "q23", "q24"];
 
 export function getQuestion(id: string): Question | undefined {
