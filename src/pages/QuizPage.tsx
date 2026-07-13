@@ -430,6 +430,10 @@ const QuizPage = () => {
                     setLocationMode("");
                     setSelectedCity("");
                     setCustomCity("");
+                    setCityError("");
+                    sessionStorage.removeItem("quizCity");
+                    sessionStorage.removeItem("quizCityLat");
+                    sessionStorage.removeItem("quizCityLng");
                     finishStep({ [currentId]: "Autour de moi" });
                   }}
                   className={`w-full px-4 py-3 rounded-xl text-left font-body border transition-colors ${locationMode === "around" ? "bg-accent text-accent-foreground border-accent" : "bg-card text-card-foreground border-border hover:border-accent/50"}`}
@@ -450,8 +454,14 @@ const QuizPage = () => {
                       onChange={(e) => {
                         const v = e.target.value;
                         setSelectedCity(v);
+                        setCityError("");
                         if (v && v !== "Autre") {
+                          const coords = getCityCoords(v);
                           sessionStorage.setItem("quizCity", v);
+                          if (coords) {
+                            sessionStorage.setItem("quizCityLat", String(coords.lat));
+                            sessionStorage.setItem("quizCityLng", String(coords.lng));
+                          }
                           finishStep({ [currentId]: v });
                         }
                       }}
@@ -465,22 +475,35 @@ const QuizPage = () => {
                         <input
                           type="text"
                           value={customCity}
-                          onChange={(e) => setCustomCity(e.target.value)}
+                          onChange={(e) => { setCustomCity(e.target.value); setCityError(""); }}
                           placeholder="Saisir une ville"
                           className="w-full px-3 py-2 rounded-lg bg-background border border-border font-body text-sm"
                         />
                         <button
-                          onClick={() => {
+                          onClick={async () => {
                             const v = customCity.trim();
                             if (!v) return;
+                            setGeocoding(true);
+                            setCityError("");
+                            const coords = await geocodeCity(v);
+                            setGeocoding(false);
+                            if (!coords) {
+                              setCityError("Ville non reconnue - vérifie l'orthographe ou choisis une ville dans la liste.");
+                              return;
+                            }
                             sessionStorage.setItem("quizCity", v);
+                            sessionStorage.setItem("quizCityLat", String(coords.lat));
+                            sessionStorage.setItem("quizCityLng", String(coords.lng));
                             finishStep({ [currentId]: v });
                           }}
-                          disabled={!customCity.trim()}
+                          disabled={!customCity.trim() || geocoding}
                           className="w-full py-2 rounded-full bg-accent text-accent-foreground font-heading font-semibold text-sm shadow-md disabled:opacity-50"
                         >
-                          Valider
+                          {geocoding ? "Recherche…" : "Valider"}
                         </button>
+                        {cityError && (
+                          <p className="text-xs font-body text-destructive">{cityError}</p>
+                        )}
                       </div>
                     )}
                   </div>
