@@ -702,8 +702,20 @@ export function matchRestaurants(answers: QuizAnswers): Restaurant[] {
         else if (q11.startsWith("Intérieur") && !r.terrasse) score += 4;
       }
 
-      // Distance hard filter
+      // Distance hard filter (walking time from Q6)
       if (r.distanceMinutes > maxMin) score -= 50;
+
+      // City geographic filter (from q_location dropdown or "Autre" geocoding)
+      if (cityFilter) {
+        const restoCoords = getCityCoords(cityFromAddress(r.address));
+        if (!restoCoords) {
+          score -= 1000; // unknown city: exclude
+        } else if (haversineKm(cityFilter, restoCoords) > CITY_FILTER_RADIUS_KM) {
+          score -= 1000; // outside the requested city area: exclude
+        } else {
+          score += 5;
+        }
+      }
 
       return { ...r, score } as Restaurant & { score: number };
     })
