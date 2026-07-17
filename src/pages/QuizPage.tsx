@@ -444,18 +444,23 @@ const QuizPage = () => {
 
             {question.type === "single" && (
               <div className="space-y-3 max-w-xs mx-auto">
-                {renderOptions.map((option) => (
-                  <motion.button
-                    key={option}
-                    onClick={() => selectOption(option)}
-                    className="w-full px-4 py-3 rounded-xl text-left font-body bg-card text-card-foreground border border-border hover:border-accent/50 transition-colors"
-                    whileTap={{ scale: 0.97 }}
-                  >
-                    {option}
-                  </motion.button>
-                ))}
+                {renderOptions.map((option) => {
+                  const icon = getOptionIcon(currentId, option);
+                  return (
+                    <motion.button
+                      key={option}
+                      onClick={() => selectOption(option)}
+                      className="w-full px-4 py-3 rounded-xl font-body bg-card text-card-foreground border border-border hover:border-accent/50 transition-colors flex items-center gap-3 text-left"
+                      whileTap={{ scale: 0.97 }}
+                    >
+                      {icon && <span className="text-2xl leading-none shrink-0" aria-hidden>{icon}</span>}
+                      <span className="flex-1">{option}</span>
+                    </motion.button>
+                  );
+                })}
               </div>
             )}
+
 
             {question.type === "multi" && (
               <div className="max-w-xs mx-auto space-y-2">
