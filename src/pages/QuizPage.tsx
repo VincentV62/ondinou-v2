@@ -18,6 +18,58 @@ const slideVariants = {
   exit: (dir: number) => ({ x: dir > 0 ? -300 : 300, opacity: 0 }),
 };
 
+// Map option text (by keywords) to an emoji icon for cliquable buttons.
+function getOptionIcon(qid: string, option: string): string | null {
+  const o = option.toLowerCase();
+  if (qid === "q7") {
+    if (o.startsWith("moins de 15")) return "🪙";
+    if (o.startsWith("15")) return "💳";
+    if (o.startsWith("30")) return "✨";
+    if (o.startsWith("50")) return "💎";
+    if (o.startsWith("80")) return "💎";
+  }
+  if (qid === "q3") {
+    if (o.includes("française")) return "🥐";
+    if (o.includes("italienne")) return "🍝";
+    if (o.includes("asiatique")) return "🥢";
+    if (o.includes("viandes")) return "🥩";
+    if (o.includes("poissons")) return "🐟";
+    if (o.includes("tendance") || o.includes("végé")) return "🥗";
+    if (o.includes("peu importe") || o.includes("surprends")) return "🎲";
+  }
+  if (qid === "q5") {
+    if (o.includes("à pied")) return "🚶";
+    if (o.includes("voiture")) return "🚗";
+    if (o.includes("transports")) return "🚇";
+    if (o.includes("vélo") || o.includes("trottinette")) return "🚲";
+    if (o.includes("taxi") || o.includes("vtc")) return "🚕";
+  }
+  if (qid === "q8") {
+    if (o.includes("romantique")) return "🕯️";
+    if (o.includes("famille")) return "👨‍👩‍👧";
+    if (o.includes("amis")) return "🥂";
+    if (o.includes("professionnel")) return "💼";
+    if (o.includes("fête") || o.includes("célébration")) return "🎉";
+    if (o.includes("quotidien")) return "🍽️";
+    if (o.includes("réussite") || o.includes("diplôme") || o.includes("promotion")) return "🏆";
+    if (o.includes("mariage") || o.includes("pacs")) return "💍";
+  }
+  if (qid === "q9") {
+    if (o.includes("intime") || o.includes("cosy")) return "🪑";
+    if (o.includes("animé") || o.includes("festif")) return "🎊";
+    if (o.includes("chic") || o.includes("élégant")) return "🎩";
+    if (o.includes("décontracté") || o.includes("convivial")) return "😊";
+    if (o.includes("original") || o.includes("atypique")) return "🎨";
+  }
+  if (qid === "q11") {
+    if (o.includes("grande terrasse")) return "☀️";
+    if (o.includes("coin terrasse")) return "🌤️";
+    if (o.includes("intérieur")) return "🏠";
+  }
+  return null;
+}
+
+
 const QuizPage = () => {
   const navigate = useNavigate();
   const [mode, setMode] = useState<QuizMode | null>(null);
