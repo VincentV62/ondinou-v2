@@ -25,7 +25,7 @@ const BottomNav = () => {
         </div>
       </button>
 
-      {/* Classement / Points */}
+      {/* Points */}
       <button onClick={() => navigate("/points")} className="flex flex-col items-center gap-0.5 p-2" aria-label="Points">
         <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="hsl(var(--accent))" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
           <rect x="3" y="14" width="5" height="8" rx="1" />
