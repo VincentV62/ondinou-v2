@@ -60,7 +60,7 @@ const loadProfile = () => {
 const ProfilePage = () => {
   const navigate = useNavigate();
 
-  const user = { name: "Vincent", dinous: 320, friends: 8, rank: 2 };
+  const user = { name: "Vincent", dinous: 320, friends: 8, tier: "Bronze" };
 
   const stored = loadProfile();
   const [tab, setTab] = useState<"infos" | "restos">("infos");
