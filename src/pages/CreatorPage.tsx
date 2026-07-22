@@ -271,7 +271,7 @@ const CreatorPage = () => {
                   </label>
                 </div>
 
-                <Field label="Faux avis client">
+                <Field label="Faux avis d'habitué">
                   <textarea value={fakeReview} onChange={(e) => setFakeReview(e.target.value)} rows={2} className={inputCls} />
                 </Field>
               </section>

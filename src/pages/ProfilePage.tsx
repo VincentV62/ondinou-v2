@@ -60,7 +60,7 @@ const loadProfile = () => {
 const ProfilePage = () => {
   const navigate = useNavigate();
 
-  const user = { name: "Vincent", dinous: 320, friends: 8, rank: 2 };
+  const user = { name: "Vincent", dinous: 320, friends: 8, tier: "Bronze" };
 
   const stored = loadProfile();
   const [tab, setTab] = useState<"infos" | "restos">("infos");
@@ -165,14 +165,14 @@ const ProfilePage = () => {
           <span className="text-lg font-bold">{user.dinous} Dinous</span>
         </div>
         <div className="flex space-x-4 text-sm text-muted-foreground mt-1">
-          <span>{user.friends} amis</span>
-          <span>#{user.rank} au classement</span>
+          <span>{user.friends} potes</span>
+          <span>Habitué niveau {user.tier}</span>
         </div>
         <Button
           variant="default"
           className="mt-4 bg-accent hover:bg-accent/90 text-accent-foreground rounded-xl"
         >
-          Ajouter des amis
+          Ajouter des potes
         </Button>
       </div>
 
@@ -368,13 +368,13 @@ const ProfilePage = () => {
         </div>
       </div>
 
-      {/* Lien vers classement */}
+      {/* Lien vers points */}
       <Button
         onClick={() => navigate("/points")}
         variant="outline"
         className="mt-8 rounded-xl border-primary text-primary"
       >
-        Voir mon classement 🚀
+        Voir mes Dinous 🚀
       </Button>
       </>
       )}

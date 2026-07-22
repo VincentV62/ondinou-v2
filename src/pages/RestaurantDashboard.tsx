@@ -121,7 +121,7 @@ function getDaysOfWeek(reservations: ReservationRow[], monthIndex: number, weekL
 }
 
 function exportCSV(reservations: ReservationRow[]) {
-  const header = "Date,Heure,Client,Couverts,Avis\n";
+  const header = "Date,Heure,Habitué,Couverts,Avis\n";
   const rows = reservations.map((r) => {
     const name = r.profile
       ? `${r.profile.first_name || ""} ${r.profile.last_name || ""}`.trim()
@@ -360,7 +360,7 @@ export default function RestaurantDashboard() {
           className="grid grid-cols-2 md:grid-cols-4 gap-3"
         >
             {[
-              { label: "Clients envoyés", value: reservations.length, icon: Users, color: "text-secondary" },
+              { label: "Habitués envoyés", value: reservations.length, icon: Users, color: "text-secondary" },
               { label: "Visiteurs simulés", value: visitorTotal || "—", icon: Users, color: "text-primary" },
             { label: "Réservations ONDINOU", value: reservations.length, icon: CalendarCheck, color: "text-accent" },
             { label: "Note moyenne Dinou", value: avgRating, icon: Star, color: "text-accent" },
@@ -462,10 +462,10 @@ export default function RestaurantDashboard() {
                     <TableHeader>
                       <TableRow>
                         <TableHead>Date & Heure</TableHead>
-                        <TableHead>Client</TableHead>
+                        <TableHead>Habitué</TableHead>
                         <TableHead className="text-center">Couverts</TableHead>
                         <TableHead className="text-center">Note laissée</TableHead>
-                        <TableHead className="text-center">Note du client</TableHead>
+                        <TableHead className="text-center">Note habitué</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
