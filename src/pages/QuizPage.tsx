@@ -308,8 +308,7 @@ const QuizPage = () => {
                   style={
                     isFeatured
                       ? {
-                          borderColor: "hsl(24, 54%, 53%)",
-                          animation: "ondinou-shimmer 2s ease-in-out infinite",
+                          borderColor: "hsl(var(--accent))",
                         }
                       : undefined
                   }
