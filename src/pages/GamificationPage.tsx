@@ -38,7 +38,7 @@ const GamificationPage = () => {
           <span>{user.friends} potes</span>
         </div>
         <Button variant="default" className="mt-3 bg-accent hover:bg-accent/90 text-accent-foreground rounded-xl">
-          Ajouter des amis
+          Ajouter des potes
         </Button>
       </div>
 

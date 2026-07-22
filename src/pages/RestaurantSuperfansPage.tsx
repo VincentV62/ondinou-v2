@@ -64,7 +64,7 @@ export default function RestaurantSuperfansPage() {
               <Users className="h-5 w-5" />
               <CardTitle className="text-xl">Liste démo des superfans</CardTitle>
             </div>
-            <p className="text-sm text-muted-foreground">Une sélection démo de clients fidèles à recontacter rapidement en cas de no-show.</p>
+            <p className="text-sm text-muted-foreground">Une sélection démo d'habitués fidèles à recontacter rapidement en cas de no-show.</p>
           </CardHeader>
           <CardContent className="space-y-6">
             <div className="overflow-x-auto rounded-xl border border-border/60 bg-card/70">
