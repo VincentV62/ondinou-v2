@@ -173,6 +173,7 @@ const ProfilePage = () => {
           className="mt-4 bg-accent hover:bg-accent/90 text-accent-foreground rounded-xl"
         >
           Ajouter des potes
+        </Button>
       </div>
 
       {/* Badges */}
