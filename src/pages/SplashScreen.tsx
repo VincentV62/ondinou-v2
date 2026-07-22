@@ -30,7 +30,7 @@ const SplashScreen = () => {
       <motion.img
         src={dinouLogo}
         alt="Dinou"
-        className="w-40 h-40 sm:w-48 sm:h-48 object-contain animate-glow-pulse"
+        className="w-40 h-40 sm:w-48 sm:h-48 object-contain"
         initial={{ scale: 0.5, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         transition={{ type: "spring", stiffness: 200, damping: 15, duration: 0.8 }}
