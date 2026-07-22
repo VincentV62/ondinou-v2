@@ -35,8 +35,7 @@ const GamificationPage = () => {
         </div>
         <h2 className="mt-2 font-semibold text-lg">{user.name}</h2>
         <div className="flex space-x-4 text-sm text-muted-foreground mt-1">
-          <span>{user.friends} amis</span>
-          <span>#{user.rank}</span>
+          <span>{user.friends} potes</span>
         </div>
         <Button variant="default" className="mt-3 bg-accent hover:bg-accent/90 text-accent-foreground rounded-xl">
           Ajouter des amis
