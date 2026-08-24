@@ -2,3 +2,6 @@ project_id = "apkihirdmhfvevfohnzu"
 
 [functions.translate]
 verify_jwt = false
+
+[functions.dinou-text]
+verify_jwt = false
