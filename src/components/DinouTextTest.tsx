@@ -58,7 +58,7 @@ export function buildDinouPayload(restaurant: Restaurant, index: number): DinouP
 
   let prenom: string | null = null;
   try {
-    prenom = sessionStorage.getItem("quizFirstName") || localStorage.getItem("profileFirstName") || null;
+    prenom = sessionStorage.getItem("userFirstName") || localStorage.getItem("profileFirstName") || null;
   } catch {
     prenom = null;
   }
