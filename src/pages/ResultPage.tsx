@@ -208,6 +208,8 @@ const ResultPage = () => {
           Voir une autre suggestion
         </button>
       </div>
+
+      <DinouTextTest restaurant={restaurant} index={index} />
     </div>
   );
 };
