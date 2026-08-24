@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { Star, MapPin, Users, Clock } from "lucide-react";
 import dinouLogo from "@/assets/dinou-logo.png";
 import { matchRestaurants, type QuizAnswers, type Restaurant } from "@/data/restaurants";
+import DinouTextTest from "@/components/DinouTextTest";
 import { t } from "@/data/i18n";
 
 const ResultPage = () => {
